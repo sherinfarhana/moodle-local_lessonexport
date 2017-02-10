@@ -1,0 +1,57 @@
+.lesson-sortpages,
+.lesson-sortpages li {
+    list-style-type: none;
+}
+
+.lesson-sortpages .lessontitle {
+    margin-left: 1em;
+}
+
+.lesson-sortpages .smallicon {
+    width: 16px;
+    height: 16px;
+}
+
+.jsenabled .lesson-sortpages .nojsicons {
+    display: none;
+}
+
+.lesson-sortpages .jsicons {
+    display: none;
+}
+
+.jsenabled .lesson-sortpages .jsicons {
+    display: inline;
+}
+
+.lesson-sortpages li.yui3-dd-draggable {
+    cursor: auto;
+}
+
+.lesson-sortpages li.yui3-dd-draggable .jsicons {
+    cursor: move;
+}
+
+.path-local-lessonexport .yui3-dd-proxy .nojsicons {
+    display: none;
+}
+
+.lesson-sortpages-spinner {
+    position: absolute;
+    display: none;
+    background-image: url([[pix:core|i/loading_small]]);
+    width: 16px;
+    height: 16px;
+}
+
+.lesson-sortpages-spinner.show {
+    display: block;
+}
+
+.contents table, 
+.contents tbody, 
+.contents th, 
+.contents tr, 
+.contents td {
+    border: 1px solid #000 !important;
+}

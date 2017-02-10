@@ -1,0 +1,10 @@
+{
+    "name": "moodle-local_lessonexport-sortpages",
+    "builds": {
+        "moodle-local_lessonexport-sortpages": {
+            "jsfiles": [
+                "sortpages.js"
+            ]
+        }
+    }
+}

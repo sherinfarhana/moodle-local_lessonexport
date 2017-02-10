@@ -1,0 +1,49 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Language strings
+ *
+ * @package   local_lessonexport
+ * @copyright 2014 Davo Smith, Synergy Learning
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+$string['created'] = 'Created on {$a}';
+$string['exportepub'] = 'Export as epub';
+$string['exportpdf'] = 'Export as PDF';
+$string['failedinsertimage'] = 'Failed to insert image: {$a}';
+$string['filename'] = 'Export {$a->lessonname} {$a->timestamp}';
+$string['modified'] = 'Last modified by {$a->modifiedby} on {$a->timemodified}';
+$string['pluginname'] = 'Lesson export';
+$string['printed'] = 'This document was downloaded on {$a}';
+$string['publishemail'] = 'Auto-publish email';
+$string['publishemail_desc'] = 'The email address that PDFs will be sent to automatically whenever a lesson changes';
+$string['publishername'] = 'Unknown';
+$string['customstyle'] = 'Custom style rules';
+$string['customstyle_desc'] = 'Custom CSS to apply only to the exported document';
+$string['sortpages'] = 'Sort pages for export';
+$string['sortpagesintro'] = 'This is the order in which pages will currently be exported - please move pages into the order you would like them to be exported';
+$string['lessonexport:exportepub'] = 'Export lesson as epub';
+$string['lessonexport:exportpdf'] = 'Export lesson as PDF';
+$string['lessonexportfailed'] = 'Export of lesson \'{$a}\' failed';
+$string['lessonexportfailed_body'] = 'The lesson \'{$a->name}\' has been updated, but the attempt to export and email it has failed, after {$a->exportattempts} attempts. If the lesson is updated again, then further attempts will be made to export it.
+
+The Lesson can be found at: {$a->url}.';
+$string['lessonupdated'] = 'Lesson \'{$a}\' updated';
+$string['lessonupdated_body'] = 'Updated export attached';
