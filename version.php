@@ -18,7 +18,8 @@
  * Version information
  *
  * @package   local_lessonexport
- * @copyright 2014 Davo Smith, Synergy Learning
+ * @author    Adam King
+ * @author    Davo Smith
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
