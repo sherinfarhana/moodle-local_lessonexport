@@ -17,6 +17,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
+defined('MOODLE_INTERNAL') || die();  
 
 if (!class_exists('LuciZip'))
     require_once 'LuciZip.php';
@@ -39,10 +40,10 @@ class LessonLuciEPUB {
     protected $extra = array();
 
     protected function generate_id($spine = FALSE) {
-	if ($spine)
-	    return 'luci' . $this->spine_counter++;
-	else
-	    return 'icul' . $this->counter++;
+		if ($spine)
+			return 'luci' . $this->spine_counter++;
+		else
+			return 'icul' . $this->counter++;
     }
 
     public function set_title($title) {
@@ -50,14 +51,14 @@ class LessonLuciEPUB {
     }
 
     public function add_author($name, $fileas = NULL, $displayseq = NULL) {
-	$this->add_creator($name, 'aut', $fileas, $displayseq);
+		$this->add_creator($name, 'aut', $fileas, $displayseq);
     }
 
     public function add_creator($name, $role = NULL, $fileas = NULL, $displayseq = NULL) {
-	$this->creators[] = array('name' => $name,
-				  'role' => $role,
-				  'file-as' => $fileas,
-				  'display-seq' => $displayseq);
+		$this->creators[] = array('name' => $name,
+								'role' => $role,
+								'file-as' => $fileas,
+								'display-seq' => $displayseq);
     }
 
     public function set_publisher($publisher) {
@@ -65,98 +66,97 @@ class LessonLuciEPUB {
     }
 
     public function add_language($lang) {
-	$this->languages[] = $lang;
+		$this->languages[] = $lang;
     }
 
     public function set_rights($rights) {
-	$this->rights = $rights;
+		$this->rights = $rights;
     }
 
     public function set_description($description) {
-	$this->description = $description;
+		$this->description = $description;
     }
 
     public function set_source($src, $type = NULL) {
-	if (!$type) {
-	    if (substr($src, 0, 9) == 'urn:isbn:')
-		$type = 'isbn';
-	}
-	$this->source = array($src, $type);
+		if (!$type) {
+			if (substr($src, 0, 9) == 'urn:isbn:')
+				$type = 'isbn';
+		}
+		$this->source = array($src, $type);
     }
 
     public function set_date($date = NULL) {
-	if ($date)
-	    $this->date = $date;
-	else {
-	    /*
-	    $tz = @date('P');
-	    if ($tz == '+00:00')
-		$tz = 'Z';
-	    */
-	    $this->date = @gmdate('Y-m-d\TH:i:s') . 'Z';
-	    //$this->date = @date(DATE_W3C);
-	}
+		if ($date)
+			$this->date = $date;
+		else {
+			/*
+			$tz = @date('P');
+			if ($tz == '+00:00')
+			$tz = 'Z';
+			*/
+			$this->date = @gmdate('Y-m-d\TH:i:s') . 'Z';
+			//$this->date = @date(DATE_W3C);
+		}
     }
 
     public function add_date($date = NULL) {
-	// TODO
+		// TODO
     }
 
     public function set_modified($modified = NULL) {
-	if ($modified)
-	    $this->modified = $modified;
-	else {
-	    /*
-	    $tz = @date('P');
-	    if ($tz == '+00:00')
-		$tz = 'Z';
-	    */
-	    $this->modified = @gmdate('Y-m-d\TH:i:s') . 'Z';
-	    //$this->modified = @date(DATE_W3C);
-	}
+		if ($modified)
+			$this->modified = $modified;
+		else {
+			/*
+			$tz = @date('P');
+			if ($tz == '+00:00')
+			$tz = 'Z';
+			*/
+			$this->modified = @gmdate('Y-m-d\TH:i:s') . 'Z';
+			//$this->modified = @date(DATE_W3C);
+		}
     }
 
     public function set_uid($uid = NULL) {
-	if ($uid)
-	    $this->uid = $uid;
-	else
-	    $this->uid = $this->uuid4_gen();
+		if ($uid)
+			$this->uid = $uid;
+		else
+			$this->uid = $this->uuid4_gen();
     }
 
     public function add_id($id, $type = NULL) {
-	$this->ids[] = array($id, $type);
+		$this->ids[] = array($id, $type);
     }
 
     public function set_nav($data, $href = NULL) {
-	return $this->add_item($data, 'application/xhtml+xml', $href, FALSE,
+		return $this->add_item($data, 'application/xhtml+xml', $href, FALSE,
 			       NULL, 'nav', NULL, NULL);
     }
 
     public function set_cover($filepath, $type, $href = NULL, $spine = FALSE,
 			      $fallback = NULL, $properties = NULL) {
-	$props = 'cover-image';
-	if ($properties)
-	    $props .= ' ' . $properties;
-	return $this->add_item(NULL, $type, $href, $spine,
+		$props = 'cover-image';
+		if ($properties)
+			$props .= ' ' . $properties;
+		return $this->add_item(NULL, $type, $href, $spine,
 			       $fallback, $props, $filepath, NULL);
     }
 
-    public function add_spine_item($data, $href = NULL,
-				   $fallback = NULL, $properties = NULL) {
-	return $this->add_item($data, 'application/xhtml+xml', $href, TRUE,
+    public function add_spine_item($data, $href = NULL,	$fallback = NULL, $properties = NULL) {
+		return $this->add_item($data, 'application/xhtml+xml', $href, TRUE,
 			       $fallback, $properties, NULL, NULL);
     }
 
     public function add_item_file($file, $type, $href = NULL, $spine = FALSE,
 				  $fallback = NULL, $properties = NULL) {
-	return $this->add_item(NULL, $type, $href, $spine,
+		return $this->add_item(NULL, $type, $href, $spine,
 			       $fallback, $properties, NULL, $file);
     }
 
     public function add_item_filepath($filepath, $type, $href = NULL,
 				      $spine = FALSE,
 				      $fallback = NULL, $properties = NULL) {
-	return $this->add_item(NULL, $type, $href, $spine,
+		return $this->add_item(NULL, $type, $href, $spine,
 			       $fallback, $properties, $filepath, NULL);
     }
 
@@ -172,35 +172,35 @@ class LessonLuciEPUB {
     public function add_item($data, $type, $href = NULL, $spine = FALSE,
 			     $fallback = NULL, $properties = NULL,
 			     $filepath = NULL, $file = NULL) {
-	$id = $this->generate_id($spine);
-	if (!$type)
-	    $type = $this->guess_type_from_name($href);
-	if (!$href) {
-	    $href = $id;
-	    $ext = $this->guess_extension_from_type($type);
-	    if (!$ext)
-		$ext = '.fil';
-	    $href .= $ext;
-	}
-	$item = array('href' => $href,
-		      'data' => $data,
-		      'file' => $file,
-		      'filepath' => $filepath,
-		      'type' => $type,
-		      'spine' => $spine,
-		      'fallback' => $fallback,
-		      'properties' => $properties,
-		      'toc' => FALSE,
-		      'id' => $id);
-	$this->items[] = $item;
-	return $item;
+		$id = $this->generate_id($spine);
+		if (!$type)
+			$type = $this->guess_type_from_name($href);
+		if (!$href) {
+			$href = $id;
+			$ext = $this->guess_extension_from_type($type);
+			if (!$ext)
+				$ext = '.fil';
+			$href .= $ext;
+		}
+		$item = array('href' => $href,
+				'data' => $data,
+				'file' => $file,
+				'filepath' => $filepath,
+				'type' => $type,
+				'spine' => $spine,
+				'fallback' => $fallback,
+				'properties' => $properties,
+				'toc' => FALSE,
+				'id' => $id);
+		$this->items[] = $item;
+		return $item;
     }
 
     /*
      * Move last added item first
      */
     public function prepend_last_item() {
-	array_unshift($this->items, array_pop($this->items));
+		array_unshift($this->items, array_pop($this->items));
     }
 
     /*
@@ -209,242 +209,242 @@ class LessonLuciEPUB {
      * @continue - continue toc level from previous spine-item?
      */
     public function set_item_toc($title, $headers = FALSE, $continue = FALSE) {
-	$i = count($this->items) - 1;
-	$this->items[$i]['toc'] = !!($title || $headers);
-	$this->items[$i]['toc-title'] = $title;
-	$this->items[$i]['toc-headers'] = $headers;
-	$this->items[$i]['toc-continue'] = $continue;
+		$i = count($this->items) - 1;
+		$this->items[$i]['toc'] = !!($title || $headers);
+		$this->items[$i]['toc-title'] = $title;
+		$this->items[$i]['toc-headers'] = $headers;
+		$this->items[$i]['toc-continue'] = $continue;
     }
 
     /*
      * Convenince function to add HTML pages
      */
     public function add_html($html, $title, $config) {
-	if ($config['tidy']) {
-	    $tidy = new tidy;
-	    $tidy->parseString($html, $config, 'utf8');
-	    $tidy->cleanRepair();
-	    $html = $tidy->html()->value;
-	}
+		if ($config['tidy']) {
+			$tidy = new tidy;
+			$tidy->parseString($html, $config, 'utf8');
+			$tidy->cleanRepair();
+			$html = $tidy->html()->value;
+		}
 
-	$doc = new DOMDocument();
-	@$doc->loadHTML($html);
-	//$html = $doc->saveXML();
+		$doc = new DOMDocument();
+		@$doc->loadHTML($html);
+		//$html = $doc->saveXML();
 
-	if (!$title) {
-	    $title = 'Untitled';
-	    $heads = $doc->getElementsByTagName('head');
-	    if ($heads) {
-		$titles = $heads->item(0)->getElementsByTagName('title');
-		if ($titles)
-		    $title = $titles->item(0)->nodeValue;
-	    }
-	}
-
-	// Check images
-	// Handle <img> tags
-	$html = preg_replace_callback('~(<img [^>]*?)src=([\'"])(.+?)[\'"]~',
-				      array($this, 'img_callback'), $html);
-
-	if ($config['split']) {
-	    $splits = $this->split($html);
-	    $first = TRUE;
-	    foreach ($splits as $split) {
-			$this->add_spine_item($split[0], $split[1]);
-			if ($config['toc']) {
-				if ($first)
-				$this->set_item_toc($title, TRUE, FALSE);
-				else
-				$this->set_item_toc(NULL, TRUE, TRUE);
-				$first = FALSE;
+		if (!$title) {
+			$title = 'Untitled';
+			$heads = $doc->getElementsByTagName('head');			
+			if ($heads) {
+			$titles = $heads->item(0)->getElementsByTagName('title');
+			if ($titles)
+				$title = $titles->item(0)->nodeValue;
 			}
-	    }
-	} else {
-	    $this->add_spine_item($html);
-	    if ($config['toc'])
-		$this->set_item_toc($title, TRUE);
-	}
+		}
 
-	return $title;
+		// Check images
+		// Handle <img> tags
+		$html = preg_replace_callback('~(<img [^>]*?)src=([\'"])(.+?)[\'"]~',
+						array($this, 'img_callback'), $html);
+
+		if ($config['split']) {
+			$splits = $this->split($html);
+			$first = TRUE;
+			foreach ($splits as $split) {
+				$this->add_spine_item($split[0], $split[1]);
+				if ($config['toc']) {
+					if ($first)
+						$this->set_item_toc($title, TRUE, FALSE);
+					else
+						$this->set_item_toc(NULL, TRUE, TRUE);
+					$first = FALSE;
+				}
+			}
+		} else {
+			$this->add_spine_item($html);
+			if ($config['toc'])
+				$this->set_item_toc($title, TRUE);
+		}
+
+		return $title;
     }
 
     protected function img_callback($matches) {
-	$path = $matches[3];
-	$name = $this->add_extra($path);
-	return $matches[1] . ' src="' . $name . '"';
+		$path = $matches[3];
+		$name = $this->add_extra($path);
+		return $matches[1] . ' src="' . $name . '"';
     }
 
     public function add_extra($path) {
-	if (substr($path, 5) == 'data:')
-	    return $path;
+		if (substr($path, 5) == 'data:')
+			return $path;
 
-	// FIXME normalize $path
-	$path = $path;
+		// FIXME normalize $path
+		$path = $path;
 
-	if (array_key_exists($path, $this->extra))
-	    return $this->extra($path);
+		if (array_key_exists($path, $this->extra))
+			return $this->extra($path);
 
-	$fname = $path;
-	$pos = strrpos($fname, '/');
-	if ($pos !== FALSE)
-	    $fname = substr($fname, $pos + 1);
-	$i = '';
-	do {
-	    $name = 'images/' . $i . $fname;
-	    if ($i == '')
-		$i = 1;
-	    else
-		$i++;
-	} while (in_array($name, $this->extra)); // SYNERGY LEARNING - fixed typo.
+		$fname = $path;
+		$pos = strrpos($fname, '/');
+		if ($pos !== FALSE)
+			$fname = substr($fname, $pos + 1);
+		$i = '';
+		do {
+			$name = 'images/' . $i . $fname;
+			if ($i == '')
+			$i = 1;
+			else
+			$i++;
+		} while (in_array($name, $this->extra)); // SYNERGY LEARNING - fixed typo.
 
-	$this->extra[$path] = $name;
+		$this->extra[$path] = $name;
     }
 
     protected function include_extras() {
-	foreach ($this->extra as $path => $nam) {
-	    $type = NULL;
-	    $data = @file_get_contents($path);
-	    if (!$data)
-		continue;
+		foreach ($this->extra as $path => $nam) {
+			$type = NULL;
+			$data = @file_get_contents($path);
+			if (!$data)
+			continue;
 
-	    if (!$type)
-		$type = $this->guess_type_from_name($nam);
-	    if (!$type)
-		$type = 'image/jpeg';
+			if (!$type)
+			$type = $this->guess_type_from_name($nam);
+			if (!$type)
+			$type = 'image/jpeg';
 
-	    $this->add_item($data, $type, $nam);
-	}
-	$this->extra = array();
+			$this->add_item($data, $type, $nam);
+		}
+		$this->extra = array();
     }
 
     public function update_links($linkmap) {
-	$this->linkmap = $linkmap;
-	foreach ($this->items as &$item) {
-	    if ($item['type'] != 'application/xhtml+xml')
-		continue;
-	    if (!$item['data'])
-		continue;
+		$this->linkmap = $linkmap;
+		foreach ($this->items as &$item) {
+			if ($item['type'] != 'application/xhtml+xml')
+				continue;
+			if (!$item['data'])
+				continue;
 
-	    $item['data'] = preg_replace_callback('~(<a [^>]*?)href=([\'"])(.+?)(#.*?)?[\'"]~',
-						  array($this, 'link_callback'),
-						  $item['data']);
+			$item['data'] = preg_replace_callback('~(<a [^>]*?)href=([\'"])(.+?)(#.*?)?[\'"]~',
+							array($this, 'link_callback'),
+							$item['data']);
 
-	}
-	unset($this->linkmap);
+		}
+		unset($this->linkmap);
     }
 
     function link_callback($matches) {
-	$href = $matches[3];
-	$ident = NULL;
-	if (array_key_exists(4, $matches))
-	    $ident = $matches[4];
+		$href = $matches[3];
+		$ident = NULL;
+		if (array_key_exists(4, $matches))
+			$ident = $matches[4];
 
-	//error_log('link_callback: ' . $href . ':' . $ident);
-	if (array_key_exists($href, $this->linkmap))
-	    $href = $this->linkmap[$href];
-	return $matches[1] . 'href="' . $href . $ident . '"';
+		//error_log('link_callback: ' . $href . ':' . $ident);
+		if (array_key_exists($href, $this->linkmap))
+			$href = $this->linkmap[$href];
+		return $matches[1] . 'href="' . $href . $ident . '"';
     }
 
     public function generate_nav($style = NULL, $headers = TRUE) {
-	$text = self::get_html_head($this->title, $style, FALSE,
-				    "xmlns:epub='http://www.idpf.org/2007/ops'");
-	$text .= "<nav epub:type='toc' id='toc'>\n<ol/>\n</nav>\n";
-	$text .= self::get_html_end();
+		$text = self::get_html_head($this->title, $style, FALSE,
+						"xmlns:epub='http://www.idpf.org/2007/ops'");
+		$text .= "<nav epub:type='toc' id='toc'>\n<ol/>\n</nav>\n";
+		$text .= self::get_html_end();
 
-	$doc = new DOMDocument();
-	$doc->loadXML($text);
-	$root = $doc->getElementsByTagName('ol');
-	$root = $root->item(0);
-	$ol = $root;
-	$ols = array();
-	$level = array(0);
-	foreach ($this->items as &$item) {
-	    if (!$item['toc'])
-		continue;
-
-	    //error_log('A: ' . $item['toc-title']);
-
-	    if (!$item['toc-continue']) {
-		/*
-		while ($level[0] > 0) {
-		    $old = array_shift($level);
-		    $ol = $ol->parentNode;
-		    $ol = $ol->parentNode;
-		}
-		*/
-		$level = array(0);
+		$doc = new DOMDocument();
+		$doc->loadXML($text);
+		$root = $doc->getElementsByTagName('ol');
+		$root = $root->item(0);
 		$ol = $root;
-	    }
+		$ols = array();
+		$level = array(0);
+		foreach ($this->items as &$item) {
+			if (!$item['toc'])
+				continue;
 
-	    if ($item['toc-title']) {
-		/*
-		if ($ol == $root) {
-		    $pol = $root;
-		} else {	// $item['toc-continue'] == TRUE
-		    $pol = $ol->parentNode;
-		    $pol = $pol->parentNode;
-		    }*/
-		$li = $doc->createElement('li');
-		$ol->appendChild($li);
-		$a = $doc->createElement('a');
-		$li->appendChild($a);
-		$a->setAttribute('href', $item['href']);
-		$txt = $doc->createTextNode($item['toc-title']);
-		$a->appendChild($txt);
-		if (!$item['toc-continue']) {
-		    $ol = $doc->createElement('ol');
-		    $li->appendChild($ol);
-		    $ols[] = $ol;
+				//error_log('A: ' . $item['toc-title']);
+
+				if (!$item['toc-continue']) {
+				/*
+				while ($level[0] > 0) {
+					$old = array_shift($level);
+					$ol = $ol->parentNode;
+					$ol = $ol->parentNode;
+				}
+				*/
+				$level = array(0);
+				$ol = $root;
+				}
+
+				if ($item['toc-title']) {
+				/*
+				if ($ol == $root) {
+					$pol = $root;
+				} else {	// $item['toc-continue'] == TRUE
+					$pol = $ol->parentNode;
+					$pol = $pol->parentNode;
+					}*/
+				$li = $doc->createElement('li');
+				$ol->appendChild($li);
+				$a = $doc->createElement('a');
+				$li->appendChild($a);
+				$a->setAttribute('href', $item['href']);
+				$txt = $doc->createTextNode($item['toc-title']);
+				$a->appendChild($txt);
+				if (!$item['toc-continue']) {
+					$ol = $doc->createElement('ol');
+					$li->appendChild($ol);
+					$ols[] = $ol;
+				}
+			}
+
+			// Subheaders
+			$this->headers = array();
+			$item['data'] = preg_replace_callback('~(<h([1-6])([^>]*?))(>(.+?)</h\2>)~', array($this, 'head_callback'), $item['data']);
+
+			//$n = preg_match_all('~<h([1-6])([^>]*?)( id=[\'"]([^\'"]+?)[\'"])?([^>]*?)>(.+?)</h\1>~', $item['data'], $matches);
+
+			if ($this->headers) {
+				foreach ($this->headers as $header) {
+					//error_log("match");
+					if ($header[0] < 1)
+						$header[0] = 1;
+
+					while ($level[0] > $header[0]) {
+						$old = array_shift($level);
+						$ol = $ol->parentNode;
+						$ol = $ol->parentNode;
+					}
+
+					if ($level[0] < $header[0])
+						array_unshift($level, $header[0]);
+					else {	// ($level[0] == $header[0])
+						$ol = $ol->parentNode;
+						$ol = $ol->parentNode;
+					}
+
+					// Create item
+					$li = $doc->createElement('li');
+					$ol->appendChild($li);
+					$a = $doc->createElement('a');
+					$li->appendChild($a);
+					$a->setAttribute('href', $item['href'] . '#' . $header[1]);
+					$txt = $doc->createTextNode($header[2]);
+					$a->appendChild($txt);
+					$ol = $doc->createElement('ol');
+					$li->appendChild($ol);
+					$ols[] = $ol;
+				}
+			}
 		}
-	    }
 
-	    // Subheaders
-	    $this->headers = array();
-	    $item['data'] = preg_replace_callback('~(<h([1-6])([^>]*?))(>(.+?)</h\2>)~', array($this, 'head_callback'), $item['data']);
-
-	    //$n = preg_match_all('~<h([1-6])([^>]*?)( id=[\'"]([^\'"]+?)[\'"])?([^>]*?)>(.+?)</h\1>~', $item['data'], $matches);
-
-	    if ($this->headers) {
-		foreach ($this->headers as $header) {
-		    //error_log("match");
-		    if ($header[0] < 1)
-			$header[0] = 1;
-
-		    while ($level[0] > $header[0]) {
-			$old = array_shift($level);
-			$ol = $ol->parentNode;
-			$ol = $ol->parentNode;
-		    }
-
-		    if ($level[0] < $header[0])
-			array_unshift($level, $header[0]);
-		    else {	// ($level[0] == $header[0])
-			$ol = $ol->parentNode;
-			$ol = $ol->parentNode;
-		    }
-
-		    // Create item
-		    $li = $doc->createElement('li');
-		    $ol->appendChild($li);
-		    $a = $doc->createElement('a');
-		    $li->appendChild($a);
-		    $a->setAttribute('href', $item['href'] . '#' . $header[1]);
-		    $txt = $doc->createTextNode($header[2]);
-		    $a->appendChild($txt);
-		    $ol = $doc->createElement('ol');
-		    $li->appendChild($ol);
-		    $ols[] = $ol;
+		// Remove empty ol tags
+		foreach ($ols as $ol) {
+			if (!$ol->hasChildNodes())
+			$ol->parentNode->removeChild($ol);
 		}
-	    }
-	}
 
-	// Remove empty ol tags
-	foreach ($ols as $ol) {
-	    if (!$ol->hasChildNodes())
-		$ol->parentNode->removeChild($ol);
-	}
-
-	$this->set_nav($doc->saveXML());
+		$this->set_nav($doc->saveXML());
     }
 
     protected function head_callback($matches) {
@@ -781,45 +781,50 @@ class LessonLuciEPUB {
     }
 
     public static function get_html_head($title, $style = FALSE, $bodyclass = FALSE, $namespaces = '') {
-	if ($namespaces)
-	    $namespaces = ' ' . $namespaces;
-	$text = "<?xml version='1.0' encoding='UTF-8'?>\n<!DOCTYPE html>\n" .
-	    "<html xmlns='http://www.w3.org/1999/xhtml'" . $namespaces . ">\n" .
-	    "<head>\n<title>" . self::escape($title) . "</title>\n";
-	if ($style)
-	    $text .= "<link href='" . self::escape($style) .
-		"' rel='stylesheet' type='text/css'/>\n";
-	$text .= "</head>\n";
-	if ($bodyclass)
-	    $text .= "<body class='" . $bodyclass . "'>\n";
-	else
-	    $text .= "<body>\n";
-	return $text;
+		if ($namespaces)
+			$namespaces = ' ' . $namespaces;
+		$text = "<?xml version='1.0' encoding='UTF-8'?>\n<!DOCTYPE html>\n" .
+			"<html xmlns='http://www.w3.org/1999/xhtml'" . $namespaces . ">\n" .
+			"<head>\n<title>" . self::escape($title) . "</title>\n";
+		if ($style)
+			$text .= "<link href='" . self::escape($style) . "' rel='stylesheet' type='text/css'/>\n";
+		
+		$text .= "</head>\n";
+		if ($bodyclass)
+			$text .= "<body class='" . $bodyclass . "'>\n";
+		else
+			$text .= "<body>\n";
+
+		$config = get_config('local_lessonexport');
+		if (!empty($config->customstyle))
+			$text .= "<style>" . $config->customstyle . "</style>\n";
+		
+		return $text;
     }
 
     public static function get_html_end() {
-	return "</body>\n</html>";
+		return "</body>\n</html>";
     }
 
     public static function get_html_wrap($content, $title, $style = FALSE, $bodyclass = FALSE) {
-	return self::get_html_head($title, $style, $bodyclass) . $content . self::get_html_end();
+		return self::get_html_head($title, $style, $bodyclass) . $content . self::get_html_end();
     }
 
     public static function get_html_cover($title, $subtitle = NULL, $bottom = NULL, $image = NULL, $style = NULL) {
-	$html = "<br/><br/><br/><br/>\n";
-	$html .= "<div style='text-align: center'>\n";
-	$html .= "<h2>" . $title . "</h2>\n";
-	if ($subtitle)
-	    $html .= "<h4>" . $subtitle . "</h4>\n";
-	if ($image)
-	    $html .= "<p><img src='" . $image . "'/></p>\n";
-	else
-	    $html .= "<br/>\n";
-	if ($bottom)
-	    $html .= "<p>" . $bottom . "</p>\n";
-	$html .= "<br/><br/><br/>\n";
-	$html .= "</div>\n";
-	return self::get_html_wrap($html, $title, $style);
+		$html = "<br/><br/><br/><br/>\n";
+		$html .= "<div style='text-align: center'>\n";
+		$html .= "<h2>" . $title . "</h2>\n";
+		if ($subtitle)
+			$html .= "<h4>" . $subtitle . "</h4>\n";
+		if ($image)
+			$html .= "<p><img src='" . $image . "'/></p>\n";
+		else
+			$html .= "<br/>\n";
+		if ($bottom)
+			$html .= "<p>" . $bottom . "</p>\n";
+		$html .= "<br/><br/><br/>\n";
+		$html .= "</div>\n";
+		return self::get_html_wrap($html, $title, $style);
     }
 
     /*
@@ -829,17 +834,17 @@ class LessonLuciEPUB {
      * An alternative would be uuid_create() from the PECL uuid extension
      */
     public static function uuid4_gen() {
-	$b = md5(uniqid(mt_rand(), TRUE), TRUE);
-	$b[6] = chr((ord($b[6]) & 0x0F) | 0x40);
-	$b[8] = chr((ord($b[8]) & 0x3F) | 0x80);
-	return implode("-", unpack("H8a/H4b/H4c/H4d/H12e", $b));
+		$b = md5(uniqid(mt_rand(), TRUE), TRUE);
+		$b[6] = chr((ord($b[6]) & 0x0F) | 0x40);
+		$b[8] = chr((ord($b[8]) & 0x3F) | 0x80);
+		return implode("-", unpack("H8a/H4b/H4c/H4d/H12e", $b));
     }
 
     /*
      * Escape special html characters
      */
     public static function escape($data) {
-	return htmlspecialchars($data, ENT_QUOTES, "UTF-8");
+		return htmlspecialchars($data, ENT_QUOTES, "UTF-8");
     }
 
     protected static $suffix_type =
@@ -872,20 +877,20 @@ class LessonLuciEPUB {
 	      '.woff' => 'application/font-woff');
 
     public static function guess_type_from_name($name) {
-	if (!$name)
-	    return NULL;
-	$suffix = '';
-	$pos = strrpos($name, '.');
-	if ($pos !== FALSE)
-	    $suffix = strtolower(substr($name, $pos));
-	if (array_key_exists($suffix, self::$suffix_type))
-	    return self::$suffix_type[$suffix];
-	return NULL;
+		if (!$name)
+			return NULL;
+		$suffix = '';
+		$pos = strrpos($name, '.');
+		if ($pos !== FALSE)
+			$suffix = strtolower(substr($name, $pos));
+		if (array_key_exists($suffix, self::$suffix_type))
+			return self::$suffix_type[$suffix];
+		return NULL;
     }
 
     public static function guess_extension_from_type($type) {
-	if (!$type)
-	    return NULL;
-	return array_search($type, self::$suffix_type);
+		if (!$type)
+			return NULL;
+		return array_search($type, self::$suffix_type);
     }
 }

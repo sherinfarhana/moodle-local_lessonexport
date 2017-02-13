@@ -25,6 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
+require_once($CFG->dirroot.'/local/lessonexport/FPDI_Protection.php');
 require_once($CFG->dirroot.'/local/lessonexport/luciepub/LuciEPUB.php');
 
 class local_lessonexport {
@@ -205,6 +206,26 @@ class local_lessonexport {
                 print_r($lesson);
             }
         }
+    }
+
+    public function protect($password) {
+        $originalPath = get_filename(false);        
+
+        $pdf = new FPDI_Protection();
+        $pdf->FPDF('p', 'in', array('6','9'));
+
+        $pagecount = $pdf->setSourceFile($originalPath);
+
+        for ($i = 1; $i <= $pagecount; $i++) {
+            $template = $pdf->importPage($i);
+            $pdf->addPage();
+            $pdf->useTemplate($template);            
+        }
+
+        $pdf->SetProtection(array(), $password);
+        $pdf->Output($originalPath, 'D');
+
+        return $originalPath;
     }
 
     /**
@@ -586,7 +607,7 @@ function local_lessonexport_extend_navigation($unused) {
     $userid = 0;
     $lesson = $DB->get_record('lesson', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
 
-    $userid = $USER->id;
+    $userid = $this->id;
 
     if (!$links = local_lessonexport::get_links($PAGE->cm, $userid, $groupid)) { // Meant to pass $userid
         return;
@@ -735,7 +756,7 @@ function local_lessonexport_get_image_file($fileurl, $restricttocontext = null) 
 
     if (!$file = $fs->get_file($contextid, $component, $filearea, $itemid, $filepath, $filename)) {
         if ($itemid) {
-            $filepath = '/'.$itemid.$filepath; // See if there was no itemid in the original URL.
+            $filepath = '/'.$itemid.$filepath; // See if there was no itemid in the originalPath URL.
             $itemid = 0;
             $file = $fs->get_file($contextid, $component, $filename, $itemid, $filepath, $filename);
         }
@@ -758,6 +779,15 @@ class lessonexport_pdf extends pdf {
     public function use_direct_image_load($restricttocontext = false) {
         $this->directimageload = true;
         $this->restricttocontext = $restricttocontext;
+
+        // TODO:- Hook into another preg_replace
+        $config = get_config('local_lessonexport');
+        if (empty($config->customfont))
+            $font = 'helvetica';
+        else
+            $font = $config->customfont;
+
+        $this->SetFont($font, '', 12);
     }
 
     /**
@@ -822,7 +852,7 @@ class lessonexport_pdf extends pdf {
      * Copy the image data from the Moodle files API and return it directly.
      *
      * @param $fileurl
-     * @return string either the original fileurl param or the file content with '@' appended to the start.
+     * @return string either the originalPath fileurl param or the file content with '@' appended to the start.
      */
     protected function get_image_data($fileurl) {
         if ($file = local_lessonexport_get_image_file($fileurl, $this->restricttocontext)) {
@@ -886,15 +916,23 @@ class lessonexport_epub extends LessonLuciEPUB {
         return $title;
     }
 
-    public function add_spine_item($data, $href = NULL,
-                                   $fallback = NULL, $properties = NULL) {
+    public function add_spine_item($data, $href = NULL, $fallback = NULL, $properties = NULL) {        
+        $globalconf = get_config('local_lessonexport');
+        $style = '';
+
+        if (!empty($globalconf))
+            $style = $globalconf->customstyle;
+
         if (strpos('<html', $data) === false) {
             $data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
                     <!DOCTYPE html>
                     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="en" lang="en">
-                        <head>
+                        <head>                        
                         </head>
                         <body>
+                        <style>
+                        '.$style.'
+                        </style>
                         '.$data.'
                         </body>
                     </html>';

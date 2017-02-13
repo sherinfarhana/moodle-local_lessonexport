@@ -60,4 +60,11 @@ require_login($course, false, $cm);
 
 $export = new local_lessonexport($cm, $lesson, $exporttype, $user, $group);
 $export->check_access();
-$export->export();
+
+if ($exporttype === "pdf") {
+    $export->export(false);
+    $export->protect();
+    $export->download();
+} else {
+    $export->export();
+}
