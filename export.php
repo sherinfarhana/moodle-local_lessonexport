@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// defined('MOODLE_INTERNAL') || die();
-
 require_once(dirname(__FILE__).'/../../config.php');
 global $CFG, $DB, $USER, $PAGE;
 require_once($CFG->dirroot.'/local/lessonexport/lib.php');
@@ -64,7 +62,7 @@ $export = new local_lessonexport($cm, $lesson, $exporttype, $user, $group);
 $export->check_access();
 
 if ($exporttype == "pdf") {
-    $export->export(false, "testicles");
+    $export->export(true);
 } else {
     $export->export();
 }

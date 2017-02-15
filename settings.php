@@ -1,5 +1,5 @@
 <?php
-// This file is part of Moodle - http://moodle.org/
+// This file is part of Moodle http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     if (!$page = $ADMIN->locate('modsettinglesson')) {
-        // No settings page exists for the lesson - add it.
+        // No settings page exists for the lesson add it.
         $lessonname = get_string('pluginname', 'lesson');
         $page = new admin_settingpage('modsettinglesson', $lessonname);
 
@@ -50,4 +50,32 @@ if ($hassiteconfig) {
 
     $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'), 
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
+
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfpassword', get_string('pdfpassword', 'local_lessonexport'),
+                                            get_string('pdfpassword_desc', 'local_lessonexport'), ''));
+
+    // PDF permission settings
+
+    $choices = array(
+        'print'     => "Print the document",
+        'modify'    => "Modify the document",
+        'copy'      => "Copy the document",
+        'annotate'  => "Annotate documents",
+        'forms'     => "Fill forms on the document",
+        'extract'   => "Extract pages fromt he document",
+        'assemble'  => "Assemble the document",
+        'high-def'  => "Print the document in high definition"
+    );
+    $defaults = array(
+        'print'     => 'enabled',   // print
+        //'modify'    => 'enabled',  // modify
+        //'copy'      => 'enabled',  // copy
+        //'annotate'  => 'enabled',  // annotate
+        'forms'     => 'enabled',   // forms
+        //'extract'   => 'enabled',  // extract
+        //'assemble'  => 'enabled',  // assemble
+        'high-def'  => 'enabled'    // high-def
+    );
+    $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfprotect', get_string('pdfprotection','local_lessonexport'),
+                                            get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));                
 }
