@@ -46,8 +46,36 @@ if ($hassiteconfig) {
                                             get_string('publishemail_desc', 'local_lessonexport'), '', PARAM_EMAIL));
 
     $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle', get_string('customstyle', 'local_lessonexport'),
-                                            get_string('customstyle_desc', 'local_lessonexport'), '', PARAM_RAW));
+                                            get_string('customstyle_desc', 'local_lessonexport'), ''));
 
     $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'), 
-                                            get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
+                                            get_string('customfont_desc', 'local_lessonexport'), 'helvetica'));
+                                            
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfpassword', get_string('pdfpassword', 'local_lessonexport'),
+                                            get_string('pdfpassword_desc', 'local_lessonexport'), ''));
+
+    // PDF permission settings
+
+    $choices = array(
+        'print'     => "Print the document",
+        'modify'    => "Modify the document",
+        'copy'      => "Copy the document",
+        'annotate'  => "Annotate documents",
+        'forms'     => "Fill forms on the document",
+        'extract'   => "Extract pages fromt he document",
+        'assemble'  => "Assemble the document",
+        'high-def'  => "Print the document in high definition"
+    );
+    $defaults = array(
+        'print'     => 'enabled',   // print
+        //'modify'    => 'enabled',  // modify
+        //'copy'      => 'enabled',  // copy
+        //'annotate'  => 'enabled',  // annotate
+        'forms'     => 'enabled',   // forms
+        //'extract'   => 'enabled',  // extract
+        //'assemble'  => 'enabled',  // assemble
+        'high-def'  => 'enabled'    // high-def
+    );
+    $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfprotect', get_string('pdfprotection','local_lessonexport'),
+                                            get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));
 }
