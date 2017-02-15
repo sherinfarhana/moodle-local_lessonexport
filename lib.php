@@ -532,9 +532,9 @@ class local_lessonexport {
         // Logo.
         $exp->Image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
         // Title bar.
-        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(184, 204, 228));
-        $exp->Rect(9, 90, 192, 30, 'F', array(), array(79, 129, 189));
-        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(75, 172, 198));
+        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(18,160,83));
+        $exp->Rect(9, 90, 192, 30, 'F', array(), array(18,160,83));
+        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(18,160,83));
 
         // Title text.
         $title = $this->lesson->name;

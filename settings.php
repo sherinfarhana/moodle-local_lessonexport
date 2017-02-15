@@ -67,14 +67,14 @@ if ($hassiteconfig) {
         'high-def'  => "Print the document in high definition"
     );
     $defaults = array(
-        'print'     => 'enabled',   // print
+        // 'print'     => 'enabled',   // print
         //'modify'    => 'enabled',  // modify
         //'copy'      => 'enabled',  // copy
         //'annotate'  => 'enabled',  // annotate
-        'forms'     => 'enabled',   // forms
+        // 'forms'     => 'enabled',   // forms
         //'extract'   => 'enabled',  // extract
         //'assemble'  => 'enabled',  // assemble
-        'high-def'  => 'enabled'    // high-def
+        // 'high-def'  => 'enabled'    // high-def
     );
     $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfprotect', get_string('pdfprotection','local_lessonexport'),
                                             get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));                
