@@ -18,7 +18,7 @@
  * Global settings
  *
  * @package   local_lessonexport
- * @copyright 2014 Davo Smith, Synergy Learning
+ * @copyright 2017 Adam King, SHEilds eLearning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
  

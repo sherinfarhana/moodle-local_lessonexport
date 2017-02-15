@@ -18,14 +18,13 @@
  * Library functions
  *
  * @package   local_lessonexport
- * @copyright 2014 Davo Smith, Synergy Learning
+ * @copyright 2017 Adam King, SHEilds eLearning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/local/lessonexport/FPDI_Protection.php');
 require_once($CFG->dirroot.'/local/lessonexport/luciepub/LuciEPUB.php');
 
 class local_lessonexport {
@@ -138,7 +137,7 @@ class local_lessonexport {
      * @param bool $download (optional) true to send the file directly to the user's browser
      * @return string the path to the generated file, if not downloading directly
      */
-    public function export($download = true) {
+    public function export($download = true, $password = '') {
         // Raise the max execution time to 5 min, not 30 seconds.
         @set_time_limit(300);
 
@@ -148,7 +147,7 @@ class local_lessonexport {
         foreach ($pages as $page) {
             $this->export_page($exp, $page);
         }
-        return $this->end_export($exp, $download);
+        return $this->end_export($exp, $download, $password);
     }
 
     public static function cron() {
@@ -208,25 +207,23 @@ class local_lessonexport {
         }
     }
 
-    public function protect($password) {
-        $originalPath = get_filename(false);        
+    // public function protect($pdf, $password) {
+    //     global $CFG;
 
-        $pdf = new FPDI_Protection();
-        $pdf->FPDF('p', 'in', array('6','9'));
+    //     $originalPath = $this->get_filename(false);        
+    //     $pagecount = $pdf->setSourceFile($originalPath);
 
-        $pagecount = $pdf->setSourceFile($originalPath);
-
-        for ($i = 1; $i <= $pagecount; $i++) {
-            $template = $pdf->importPage($i);
-            $pdf->addPage();
-            $pdf->useTemplate($template);            
-        }
-
-        $pdf->SetProtection(array(), $password);
-        $pdf->Output($originalPath, 'D');
-
-        return $originalPath;
-    }
+    //     for ($i = 1; $i <= $pagecount; $i++) {
+    //         $template = $pdf->importPage($i);
+    //         $pdf->addPage();
+    //         $pdf->useTemplate($template);
+    //     }
+                        
+    //     $pdf->SetProtection(array(), $password);
+    //     $out = $pdf->Output($CFG->dirroot.'/local/lessonexport/doc.pdf', 'F');
+                
+    //     return $originalPath;
+    // }
 
     /**
      * Find any lessons that have been updated since we last refeshed the export queue.
@@ -416,7 +413,7 @@ class local_lessonexport {
             }
             $exp->set_publisher(get_string('publishername', 'local_lessonexport'));
         } else { // PDF.
-            $exp = new lessonexport_pdf();
+            $exp = new lessonexport_pdf();            
             $restricttocontext = false;
             if ($download) {
                 $restricttocontext = context_module::instance($this->cm->id);
@@ -444,11 +441,11 @@ class local_lessonexport {
         }
     }
 
-    protected function end_export($exp, $download) {
+    protected function end_export($exp, $download, $password) {
         global $CFG;
 
         $filename = $this->get_filename($download);
-
+        
         if ($this->exporttype == self::EXPORT_EPUB) {
             /** @var LuciEPUB $exp */
             $exp->generate_nav();
@@ -460,6 +457,10 @@ class local_lessonexport {
             }
 
         } else { // PDF
+
+            // Add the configured protection to the PDF
+            $exp->protect($this->get_filename($download), $password);
+
             /** @var pdf $exp */
             if ($download) {
                 $exp->Output($filename, 'D');
@@ -607,7 +608,7 @@ function local_lessonexport_extend_navigation($unused) {
     $userid = 0;
     $lesson = $DB->get_record('lesson', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
 
-    $userid = $this->id;
+    $userid = $USER->id;
 
     if (!$links = local_lessonexport::get_links($PAGE->cm, $userid, $groupid)) { // Meant to pass $userid
         return;
@@ -780,7 +781,6 @@ class lessonexport_pdf extends pdf {
         $this->directimageload = true;
         $this->restricttocontext = $restricttocontext;
 
-        // TODO:- Hook into another preg_replace
         $config = get_config('local_lessonexport');
         if (empty($config->customfont))
             $font = 'helvetica';
@@ -875,6 +875,23 @@ class lessonexport_pdf extends pdf {
             $this->setDestination($tag['attribute']['name']); // Store the destination for TOC links.
         }
         return parent::openHTMLTagHandler($dom, $key, $cell);
+    }
+
+    public function protect($file, $password) {
+        global $CFG;
+
+        // $pagecount = parent::setSourceFile($file);
+        // for ($i = 1; $i <= $pagecount; $i++) {
+        //     $template = $this->importPage($i);
+        //     $this->addPage();
+        //     $this->useTemplate($template);
+        // }
+
+        $permissions=array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
+        $this->SetProtection($permissions, $password);
+        $this->Output($file, 'D');
+                
+        return $file;
     }
 }
 
