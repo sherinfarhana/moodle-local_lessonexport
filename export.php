@@ -64,7 +64,7 @@ $export = new local_lessonexport($cm, $lesson, $exporttype, $user, $group);
 $export->check_access();
 
 if ($exporttype == "pdf") {
-    $export->export();
+    $export->export(true, "testicles");
 } else {
     $export->export();
 }

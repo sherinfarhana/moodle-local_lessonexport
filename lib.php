@@ -137,7 +137,7 @@ class local_lessonexport {
      * @param bool $download (optional) true to send the file directly to the user's browser
      * @return string the path to the generated file, if not downloading directly
      */
-    public function export($download = true) {
+    public function export($download = true, $password = '') {
         // Raise the max execution time to 5 min, not 30 seconds.
         @set_time_limit(300);
 
@@ -147,7 +147,7 @@ class local_lessonexport {
         foreach ($pages as $page) {
             $this->export_page($exp, $page);
         }
-        return $this->end_export($exp, $download);
+        return $this->end_export($exp, $download, $password);
     }
 
     public static function cron() {
@@ -206,6 +206,24 @@ class local_lessonexport {
             }
         }
     }
+
+    // public function protect($pdf, $password) {
+    //     global $CFG;
+
+    //     $originalPath = $this->get_filename(false);        
+    //     $pagecount = $pdf->setSourceFile($originalPath);
+
+    //     for ($i = 1; $i <= $pagecount; $i++) {
+    //         $template = $pdf->importPage($i);
+    //         $pdf->addPage();
+    //         $pdf->useTemplate($template);
+    //     }
+                        
+    //     $pdf->SetProtection(array(), $password);
+    //     $out = $pdf->Output($CFG->dirroot.'/local/lessonexport/doc.pdf', 'F');
+                
+    //     return $originalPath;
+    // }
 
     /**
      * Find any lessons that have been updated since we last refeshed the export queue.
@@ -423,7 +441,7 @@ class local_lessonexport {
         }
     }
 
-    protected function end_export($exp, $download) {
+    protected function end_export($exp, $download, $password) {
         global $CFG;
 
         $filename = $this->get_filename($download);
@@ -441,7 +459,7 @@ class local_lessonexport {
         } else { // PDF
 
             // Add the configured protection to the PDF
-            $exp->protect($this->get_filename($download));
+            $exp->protect($this->get_filename($download), $password);
 
             /** @var pdf $exp */
             if ($download) {
@@ -859,15 +877,17 @@ class lessonexport_pdf extends pdf {
         return parent::openHTMLTagHandler($dom, $key, $cell);
     }
 
-    public function protect($file) {
+    public function protect($file, $password) {
         global $CFG;
 
-        // $permissions=array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
+        // $pagecount = parent::setSourceFile($file);
+        // for ($i = 1; $i <= $pagecount; $i++) {
+        //     $template = $this->importPage($i);
+        //     $this->addPage();
+        //     $this->useTemplate($template);
+        // }
 
-        $config = get_config('local_lessonexport');
-        $permissions = $config->pdfprotect;
-        $password = $config->pdfpassword;
-
+        $permissions=array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
         $this->SetProtection($permissions, $password);
         $this->Output($file, 'D');
                 
