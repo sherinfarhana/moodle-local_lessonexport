@@ -44,10 +44,7 @@ if ($hassiteconfig) {
 
     $page->add(new admin_setting_configtext('local_lessonexport/publishemail', get_string('publishemail', 'local_lessonexport'),
                                             get_string('publishemail_desc', 'local_lessonexport'), '', PARAM_EMAIL));
-
-    $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle', get_string('customstyle', 'local_lessonexport'),
-                                            get_string('customstyle_desc', 'local_lessonexport'), '', PARAM_RAW));
-
+    
     $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'), 
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
 

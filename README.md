@@ -1,13 +1,13 @@
 Lesson export
 ===========
 
-This plugin adds the ability to export Moodle lessons as either PDFs or epub documents.
+This plugin adds the ability to export Moodle lessons as PDF documents.
 Many thanks to Davo Smith for developing the original base-code this plugin was ported from.
 
 Usage
 =====
 
-Once the plugin is installed, you can visit a lesson, then click on the new 'Export as epub' or 'Export as PDF' links that appear
+Once the plugin is installed, you can visit a lesson, then click on the new 'Export as PDF' link that appears
 in the activity administration block (with javascript enabled, similar links are inserted on the top-right corner of the page).
 
 There is an additional global setting which allows a copy of any lessons on the site to be sent (as a PDF) to a given email address,
