@@ -437,10 +437,10 @@ class local_lessonexport {
             } else {
                 $out->setZipFile($filename);
             }
-
         } else { // PDF
 
-            $config = get_config('local_lessonexport');            
+            $config = get_config('local_lessonexport');
+
             $userPassword = $config->pdfUserPassword;
             $ownerPassword = $config->pdfOwnerPassword;
 
