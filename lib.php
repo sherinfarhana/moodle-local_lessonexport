@@ -804,25 +804,53 @@ class lessonexport_pdf extends pdf {
     public function Image($file, $x = '', $y = '', $w = 0, $h = 0, $type = '', $link = '', $align = '', $resize = false,
                           $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false,
                           $fitonpage = false, $alt = false, $altimgs = array()) {
-        if ($this->directimageload) {
-            // Get the image data directly from the Moodle files API (needed when generating within cron, instead of downloading).
-            $file = $this->get_image_data($file);
-        } else {
-            // Make sure the filename part of the URL is urlencoded (convert spaces => %20, etc.).
-            if (strpos('pluginfile.php', $file) !== false) {
-                $urlparts = explode('/', $file);
-                $filename = array_pop($urlparts); // Get just the part at the end.
-                $filename = rawurldecode($filename); // Decode => make sure the URL isn't double-encoded.
-                $filename = rawurlencode($filename);
-                $urlparts[] = $filename;
-                $file = implode('/', $urlparts);
+        
+        $config = get_config('local_lessonexport');
+        $exportstrict = $config->exportstrict;
+        
+        if ($exportstrict) {
+            if ($this->directimageload) {
+                // Get the image data directly from the Moodle files API (needed when generating within cron, instead of downloading).
+                $file = $this->get_image_data($file);
+            } else {
+                // Make sure the filename part of the URL is urlencoded (convert spaces => %20, etc.).
+                if (strpos('pluginfile.php', $file) !== false) {
+                    $urlparts = explode('/', $file);
+                    $filename = array_pop($urlparts); // Get just the part at the end.
+                    $filename = rawurldecode($filename); // Decode => make sure the URL isn't double-encoded.
+                    $filename = rawurlencode($filename);
+                    $urlparts[] = $filename;
+                    $file = implode('/', $urlparts);
+                }
             }
-        }
-        try {
-            parent::Image($file, $x, $y, $w, $h, $type, $link, $align, $resize, $dpi, $palign, $ismask, $imgmask, $border,
+            try {
+                parent::Image($file, $x, $y, $w, $h, $type, $link, $align, $resize, $dpi, $palign, $ismask, $imgmask, $border,
                           $fitbox, $hidden, $fitonpage, $alt, $altimgs);
-        } catch (Exception $e) {
-            $this->writeHTML(get_string('failedinsertimage', 'local_lessonexport', $file));
+            } catch (Exception $e) {
+                $this->writeHTML(get_string('failedinsertimage', 'local_lessonexport', $file));
+            }            
+        } 
+        else {
+            try {
+                if ($this->directimageload) {
+                    // Get the image data directly from the Moodle files API (needed when generating within cron, instead of downloading).
+                    $file = $this->get_image_data($file);
+                } else {
+                    // Make sure the filename part of the URL is urlencoded (convert spaces => %20, etc.).
+                    if (strpos('pluginfile.php', $file) !== false) {
+                        $urlparts = explode('/', $file);
+                        $filename = array_pop($urlparts); // Get just the part at the end.
+                        $filename = rawurldecode($filename); // Decode => make sure the URL isn't double-encoded.
+                        $filename = rawurlencode($filename);
+                        $urlparts[] = $filename;
+                        $file = implode('/', $urlparts);
+                    }
+                }
+                parent::Image($file, $x, $y, $w, $h, $type, $link, $align, $resize, $dpi, $palign, $ismask, $imgmask, $border,
+                            $fitbox, $hidden, $fitonpage, $alt, $altimgs);
+            } catch (Exception $e) {
+                // ignore
+            }
         }
     }
 

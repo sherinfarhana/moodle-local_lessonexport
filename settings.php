@@ -80,5 +80,8 @@ if ($hassiteconfig) {
         // 'high-def'  => 'enabled'    // high-def
     );
     $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfprotect', get_string('pdfprotection','local_lessonexport'),
-                                            get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));                
+                                            get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));
+
+    $page->add(new admin_setting_configcheckbox('local_lessonexport/exportstrict', get_string('exportstrict', 'local_lessonexport'),
+    get_string('exportstrict_desc', 'local_lessonexport'), 0));
 }
