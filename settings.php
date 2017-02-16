@@ -51,8 +51,11 @@ if ($hassiteconfig) {
     $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'), 
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
 
-    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfpassword', get_string('pdfpassword', 'local_lessonexport'),
-                                            get_string('pdfpassword_desc', 'local_lessonexport'), ''));
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfUserPassword', get_string('pdfuserpassword', 'local_lessonexport'),
+                                            get_string('pdfuserpassword_desc', 'local_lessonexport'), ''));
+
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfOwnerPassword', get_string('pdfownerpassword', 'local_lessonexport'),
+                                            get_string('pdfownerpassword_desc', 'local_lessonexport'), ''));
 
     // PDF permission settings
 
