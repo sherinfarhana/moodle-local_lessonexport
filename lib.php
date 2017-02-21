@@ -57,8 +57,8 @@ class local_lessonexport {
     }
 
     public static function get_links($cm) {
-        $ret = array();
         $context = context_module::instance($cm->id);
+        $ret = array();
 
         // Add links for the different export types.
         foreach (self::$exporttypes as $exporttype) {

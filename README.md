@@ -10,11 +10,23 @@ Usage
 Once the plugin is installed, you can visit a lesson, then click on the new 'Export as epub' or 'Export as PDF' links that appear
 in the activity administration block (with javascript enabled, similar links are inserted on the top-right corner of the page).
 
-There is an additional global setting which allows a copy of any lessons on the site to be sent (as a PDF) to a given email address,
-whenever they are updated (note, this will not export all lessons on the site the first time it is configured, it only sends those
-that have been updated since the email address was first entered).
+Settings
+========
 
-There is also a global setting to define additional custom style rules that will take effect only in the exported document.
+There are many globally configurable options for exporting PDF documents from a lesson including;
+
+## Common Settings
+- An auto-publish email address
+- Strict mode - Throw exceptions on content errors
+
+## PDF Settings
+- Configurable PDF protection settings
+- A user password
+- A owner password
+- A font family
+
+## EPUB Settings
+- Custom CSS
 
 Customising
 ===========
@@ -28,7 +40,10 @@ Customise the following language strings, to alter the embedded export informati
 
 (see https://docs.moodle.org/en/Language_customization for more details)
 
-Contact
+Disclaimer
 =======
 
-Any enquiries should be sent to devadamking@gmail.com
+This repository has been modified, from the wikiexport plugin, with the sole intention of exporting Lesson modules. It is provided as-is and is open to pull
+requests or issues. It was developed by Adam King for use at [SHEilds Health & Safety](http://sheilds.org/). Any development going forwards will be to abstract
+the plugin to match many use-cases. There is a [pdfonly](https://github.com/adam-p-king/moodle_lessonexport_pdf/tree/pdfonly) branch for those who do not want
+to use EPUB at all as PDF has standard protection implemented; using EPUB alongisde PDF would compromise that.
