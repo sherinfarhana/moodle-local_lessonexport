@@ -86,5 +86,5 @@ function xmldb_local_lessonexport_upgrade($oldversion = 0) {
         upgrade_plugin_savepoint(true, 2015071300, 'local', 'lessonexport');
     }
 
-   return true;
+    return true;
 }

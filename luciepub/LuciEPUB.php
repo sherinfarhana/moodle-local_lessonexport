@@ -1,5 +1,4 @@
 <?php
-
   /*
     LuciEPUB - EPUB generator
     Copyright © 2012-2014  Mikael Ylikoski
@@ -17,10 +16,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
-defined('MOODLE_INTERNAL') || die();  
+defined('MOODLE_INTERNAL') || die();
 
-if (!class_exists('LuciZip'))
-    require_once 'LuciZip.php';
+if (!class_exists('LuciZip')) {
+    require_once('LuciZip.php');
+}
 
 class LessonLuciEPUB {
     protected $title = 'Lucidor';
@@ -233,7 +233,7 @@ class LessonLuciEPUB {
 
 		if (!$title) {
 			$title = 'Untitled';
-			$heads = $doc->getElementsByTagName('head');			
+			$heads = $doc->getElementsByTagName('head');
 			if ($heads) {
 			$titles = $heads->item(0)->getElementsByTagName('title');
 			if ($titles)
@@ -788,7 +788,7 @@ class LessonLuciEPUB {
 			"<head>\n<title>" . self::escape($title) . "</title>\n";
 		if ($style)
 			$text .= "<link href='" . self::escape($style) . "' rel='stylesheet' type='text/css'/>\n";
-		
+
 		$text .= "</head>\n";
 		if ($bodyclass)
 			$text .= "<body class='" . $bodyclass . "'>\n";
@@ -798,7 +798,7 @@ class LessonLuciEPUB {
 		$config = get_config('local_lessonexport');
 		if (!empty($config->customstyle))
 			$text .= "<style>" . $config->customstyle . "</style>\n";
-		
+
 		return $text;
     }
 

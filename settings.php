@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * Global settings
  *
@@ -21,26 +21,12 @@
  * @copyright 2017 Adam King, SHEilds eLearning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    if (!$page = $ADMIN->locate('modsettinglesson')) {
-        // No settings page exists for the lesson add it.
-        $lessonname = get_string('pluginname', 'lesson');
-        $page = new admin_settingpage('modsettinglesson', $lessonname);
-
-        // Insert the new lesson settings page in the correct alphabetical order.
-        $beforesibling = null;
-        $modules = $ADMIN->locate('modsettings');
-        foreach ($modules->children as $module) {
-            if (strcmp($module->visiblename, $lessonname) > 0) {
-                $beforesibling = $module->name;
-                break;
-            }
-        }
-        $ADMIN->add('modsettings', $page, $beforesibling);
-    }
+    $ADMIN->add('modules', new admin_category('lessonexport', 'Lesson Export'));
+    $page = new admin_settingpage('lessonexportpage', 'Lesson Export');
 
     $page->add(new admin_setting_configtext('local_lessonexport/publishemail', get_string('publishemail', 'local_lessonexport'),
                                             get_string('publishemail_desc', 'local_lessonexport'), '', PARAM_EMAIL));
@@ -48,7 +34,7 @@ if ($hassiteconfig) {
     $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle', get_string('customstyle', 'local_lessonexport'),
                                             get_string('customstyle_desc', 'local_lessonexport'), '', PARAM_RAW));
 
-    $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'), 
+    $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'),
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
 
     $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfUserPassword', get_string('pdfuserpassword', 'local_lessonexport'),
@@ -84,4 +70,6 @@ if ($hassiteconfig) {
 
     $page->add(new admin_setting_configcheckbox('local_lessonexport/exportstrict', get_string('exportstrict', 'local_lessonexport'),
     get_string('exportstrict_desc', 'local_lessonexport'), 0));
+
+    $ADMIN->add('lessonexport', $page);
 }

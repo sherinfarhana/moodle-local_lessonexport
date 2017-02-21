@@ -155,7 +155,7 @@ class local_lessonexport {
 
                 // Export successful - update the queue.
                 self::remove_from_queue($lesson);
-            } catch(Exception $e) {
+            } catch (Exception $e) {
                 print_r($e);
                 print_r($lesson);
             }
@@ -211,7 +211,7 @@ class local_lessonexport {
      *
      * @return object|null null if none left to export
      */
-	protected static function get_next_from_queue() {
+    protected static function get_next_from_queue() {
         global $DB;
 
         static $cm = null;
@@ -364,7 +364,6 @@ class local_lessonexport {
 
     protected function export_page($exp, $page) {
         if ($this->exporttype == self::EXPORT_EPUB) {
-            /** @var LuciEPUB $exp */
             $content = '<h1>'.$page->title.'</h1>'.$page->contents;
             $href = 'pageid-'.$page->id.'.html';
             $exp->add_html($content, $page->title, array('tidy' => false, 'href' => $href, 'toc' => true));
@@ -396,13 +395,12 @@ class local_lessonexport {
 
             $config = get_config('local_lessonexport');
 
-            $userPassword = $config->pdfUserPassword;
-            $ownerPassword = $config->pdfOwnerPassword;
+            $userpassword = $config->pdfUserPassword;
+            $ownerpassword = $config->pdfOwnerPassword;
 
             // Add the configured protection to the PDF
-            $exp->protect($this->get_filename($download), $userPassword, $ownerPassword);
+            $exp->protect($this->get_filename($download), $userpassword, $ownerpassword);
 
-            /** @var pdf $exp */
             if ($download) {
                 $exp->Output($filename, 'D');
             } else {
@@ -488,9 +486,9 @@ class local_lessonexport {
         // Logo.
         $exp->image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
         // Title bar.
-        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(18,160,83));
-        $exp->Rect(9, 90, 192, 30, 'F', array(), array(18,160,83));
-        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(18,160,83));
+        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(18, 160, 83));
+        $exp->Rect(9, 90, 192, 30, 'F', array(), array(18, 160, 83));
+        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(18, 160, 83));
 
         // Title text.
         $title = $this->lesson->name;
@@ -720,10 +718,11 @@ class lessonexport_pdf extends pdf {
         $this->restricttocontext = $restricttocontext;
 
         $config = get_config('local_lessonexport');
-        if (empty($config->customfont))
+        if (empty($config->customfont)) {
             $font = 'helvetica';
-        else
+        } else {
             $font = $config->customfont;
+        }
 
         $this->SetFont($font, '', 12);
     }
@@ -781,8 +780,7 @@ class lessonexport_pdf extends pdf {
             } catch (Exception $e) {
                 $this->writeHTML(get_string('failedinsertimage', 'local_lessonexport', $file));
             }
-        }
-        else {
+        } else {
             try {
                 if ($this->directimageload) {
                     // Get the image data directly from the Moodle files API (needed when generating within cron, instead of downloading).
@@ -843,11 +841,12 @@ class lessonexport_pdf extends pdf {
         return parent::openHTMLTagHandler($dom, $key, $cell);
     }
 
-    public function protect($file, $userPassword, $ownerPassword) {
+    public function protect($file, $userpassword, $ownerpassword) {
         global $CFG;
 
-        $permissions=array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
-        $this->SetProtection($permissions, $userPassword, $ownerPassword);
+        // TODO:- Replace with config.
+        $permissions = array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
+        $this->SetProtection($permissions, $userpassword, $ownerpassword);
         $this->Output($file, 'D');
 
         return $file;
@@ -892,12 +891,13 @@ class lessonexport_epub extends LessonLuciEPUB {
         return $title;
     }
 
-    public function add_spine_item($data, $href = NULL, $fallback = NULL, $properties = NULL) {
+    public function add_spine_item($data, $href = null, $fallback = null, $properties = null) {
         $globalconf = get_config('local_lessonexport');
         $style = '';
 
-        if (!empty($globalconf))
+        if (!empty($globalconf)) {
             $style = $globalconf->customstyle;
+        }
 
         if (strpos('<html', $data) === false) {
             $data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
