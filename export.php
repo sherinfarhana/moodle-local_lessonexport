@@ -13,7 +13,7 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
- 
+
 /**
  * Main entry point for export
  *
@@ -28,37 +28,15 @@ require_once($CFG->dirroot.'/local/lessonexport/lib.php');
 
 $cmid = required_param('id', PARAM_INT);
 $exporttype = required_param('type', PARAM_ALPHA);
-$groupid = optional_param('groupid', 0, PARAM_INT);
-
-$user = null;
 $cm = get_coursemodule_from_id('lesson', $cmid, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $lesson = $DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST);
-
-$userid = required_param('userid', PARAM_INT);
-if ($userid == $USER->id) {
-    $user = $USER;
-} else {
-    $user = $DB->get_record('user', array('id' => $userid), '*', MUST_EXIST);
-}
-
-$group = null;
-if ($groupid && $cm->groupmode != NOGROUPS) {
-    $group = $DB->get_record('groups', array('id' => $groupid, 'courseid' => $course->id), '*', MUST_EXIST);
-}
-
 $url = new moodle_url('/local/lessonexport/export.php', array('id' => $cm->id, 'type' => $exporttype));
-if ($user) {
-    $url->param('userid', $user->id);
-}
-if ($group) {
-    $url->param('groupid', $group->id);
-}
-$PAGE->set_url($url);
 
+$PAGE->set_url($url);
 require_login($course, false, $cm);
 
-$export = new local_lessonexport($cm, $lesson, $exporttype, $user, $group);
+$export = new local_lessonexport($cm, $lesson, $exporttype);
 $export->check_access();
 
 if ($exporttype == "pdf") {
