@@ -931,13 +931,15 @@ class lessonexport_pdf extends pdf {
 
         // Invert the selection so the user ticks boxes to _give_ permissions
         foreach ($permissions as $permission) {
-            for ($i = 0; $i < sizeof($defaults); $i++) {
-                if ($permission == $defaults[$i]) {
+            foreach ($defaults as $default) {
+                if ($permission == $default) {
                     // delete the permission from the defaults
                     unset($defaults[array_search($permission, $defaults)]);
                 }
             }
         }
+
+        $permissions = $defaults;
 
         $this->SetProtection($permissions, $userpassword, $ownerpassword);
         $this->Output($file, 'D');
