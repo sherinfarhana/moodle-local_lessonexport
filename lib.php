@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/local/lessonexport/luciepub/LuciEPUB.php');
+require_once($CFG->dirroot.'/local/lessonexport/lib/luciepub/LuciEPUB.php');
 
 class local_lessonexport {
     /** @var object */
@@ -56,6 +56,13 @@ class local_lessonexport {
         }
     }
 
+    /**
+     * Generate an array of links that should be placed on the page,
+     * given that the user has the necessary permissions for the current
+     * Course Module.
+     *
+     * @param object The Course Module from the current context.
+     */
     public static function get_links($cm) {
         $context = context_module::instance($cm->id);
         $ret = array();
@@ -69,16 +76,14 @@ class local_lessonexport {
                 $ret[$name] = $url;
             }
         }
-
-        // Add the 'sort pages' link.
-        if (has_capability('mod/lesson:managelesson', $context)) {
-            $name = get_string('sortpages', 'local_lessonexport');
-            $url = new moodle_url('/local/lessonexport/sortpages.php', array('id' => $cm->id));
-            $ret[$name] = $url;
-        }
         return $ret;
     }
 
+    /**
+     * Ensure that the user has access to perform export operations where required.
+     *
+     * @throws required_capability_exception if the user does not have the capability.
+     */
     public function check_access() {
         global $USER;
         $context = context_module::instance($this->cm->id);
@@ -105,6 +110,11 @@ class local_lessonexport {
         return $this->end_export($exp, $download);
     }
 
+    /**
+     * The cron tasks to run every time the cron is run.
+     * This includes checking the update_queue for changes to email
+     * an exported document to the configured email address.
+     */
     public static function cron() {
         $config = get_config('local_lessonexport');
         if (empty($config->publishemail)) {
@@ -289,9 +299,18 @@ class local_lessonexport {
         return $pages;
     }
 
+
+    /**
+     * Fix internal TOC links to include the pageid (to make them unique across all pages).
+     * Replaces links to other pages with anchor links to '#pageid-[page id]'.
+     * Replaces unnecessary links with blank anchors.
+     *
+     * @param page The page to fix.
+     * @param padeids An array of page identifiers, from the loaded pages.
+     * @see local_lessonexport::load_pages() for the array of pageids.
+     */
     protected function fix_internal_links($page, $pageids) {
         if ($this->exporttype == self::EXPORT_PDF) {
-            // Fix internal TOC links to include the pageid (to make them unique across all pages).
             if (preg_match_all('|<a href="#([^"]+)"|', $page->contents, $matches)) {
                 $anchors = $matches[1];
                 foreach ($anchors as $anchor) {
@@ -337,6 +356,12 @@ class local_lessonexport {
         $page->contents = preg_replace('|<a href="edit\.php.*?\[edit\]</a>|', '', $page->contents);
     }
 
+    /**
+     * The first step of exporting a document. This method creates an instance of the correct
+     * export type and then sets the correct properties on it.
+     *
+     * @return object An instance of lessonexport_pdf or lessonexport_epub.
+     */
     protected function start_export($download) {
         global $CFG;
         $exp = null;
@@ -362,6 +387,13 @@ class local_lessonexport {
         return $exp;
     }
 
+    /**
+     * Add a page of content to the exported document. The page is built with HTML directly for EPUB.
+     * For PDF a page is first added, the destination link is set and finally the HTML is written.
+     *
+     * @param exp The export object of type lessonexport_epub or lessonexport_pdf.
+     * @param page The page to add to the export object.
+     */
     protected function export_page($exp, $page) {
         if ($this->exporttype == self::EXPORT_EPUB) {
             $content = '<h1>'.$page->title.'</h1>'.$page->contents;
@@ -377,6 +409,13 @@ class local_lessonexport {
         }
     }
 
+    /*
+     * Finish exporting, with protection for PDF, export the document and
+     * produce a file from the document object. The output can be a file name
+     * or a path to the document depending on $download.
+     *
+     * @return string The file name or path to the document.
+     */
     protected function end_export($exp, $download) {
         global $CFG;
 
@@ -392,14 +431,8 @@ class local_lessonexport {
                 $out->setZipFile($filename);
             }
         } else { // PDF
-
-            $config = get_config('local_lessonexport');
-
-            $userpassword = $config->pdfUserPassword;
-            $ownerpassword = $config->pdfOwnerPassword;
-
             // Add the configured protection to the PDF
-            $exp->protect($this->get_filename($download), $userpassword, $ownerpassword);
+            $exp->protect($this->get_filename($download));
 
             if ($download) {
                 $exp->Output($filename, 'D');
@@ -414,6 +447,12 @@ class local_lessonexport {
         return $filename;
     }
 
+    /**
+     * Generate a file name or file path based on whether the file will be
+     * immediately downloaded or not.
+     *
+     * @param download A boolean of whether the file will be immediately downloaded.
+     */
     protected function get_filename($download) {
         $info = (object)array(
             'timestamp' => userdate(time(), '%Y-%m-%d %H:%M'),
@@ -437,6 +476,12 @@ class local_lessonexport {
         return $filename;
     }
 
+    /**
+     * Determine which export type to add the cover sheet to and
+     * apply it.
+     *
+     * @param exp The export object to add the cover-sheet to.
+     */
     protected function add_coversheet($exp) {
         if ($this->exporttype == self::EXPORT_EPUB) {
             $this->add_coversheet_epub($exp);
@@ -445,6 +490,12 @@ class local_lessonexport {
         }
     }
 
+    /**
+     * Add a cover sheet before all of the page contents containing the Lesson title,
+     * the description, and other configurable data.
+     *
+     * @param exp The lessonexport_epub object to add the cover-sheet to.
+     */
     protected function add_coversheet_epub(LessonLuciEPUB $exp) {
         global $CFG;
 
@@ -477,6 +528,12 @@ class local_lessonexport {
         $exp->add_spine_item($html, 'cover.html');
     }
 
+    /**
+     * Add a cover sheet before all of the page contents containing the Lesson title,
+     * the description, and other configurable data.
+     *
+     * @param exp The lessonexport_pdf object to add the cover-sheet to.
+     */
     protected function add_coversheet_pdf(pdf $exp) {
         global $CFG;
 
@@ -506,6 +563,12 @@ class local_lessonexport {
         }
     }
 
+    /**
+     * Produce an array of information, from this instance, to apply to the
+     * cover page of the document and turn it into HTML.
+     *
+     * @return string A HTML string of the imploded export data.
+     */
     protected function get_coversheet_info() {
         $info = array();
         if ($this->lessoninfo->has_timemodified()) {
@@ -841,11 +904,20 @@ class lessonexport_pdf extends pdf {
         return parent::openHTMLTagHandler($dom, $key, $cell);
     }
 
+    /**
+     * Add protection to the PDF document, configured in the global administrative settings.
+     *
+     * @param file The file to apply the protection to.
+     */
     public function protect($file, $userpassword, $ownerpassword) {
         global $CFG;
 
-        // TODO:- Replace with config.
-        $permissions = array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
+        $config = get_config('local_lessonexport');
+        $userpassword = $config->pdfUserPassword;
+        $ownerpassword = $config->pdfOwnerPassword;
+        $values = $config->pdfProtection;
+        $permissions = array_keys($permissions);
+
         $this->SetProtection($permissions, $userpassword, $ownerpassword);
         $this->Output($file, 'D');
 
@@ -857,6 +929,13 @@ class lessonexport_pdf extends pdf {
  * Class lessonexport_epub
  */
 class lessonexport_epub extends LessonLuciEPUB {
+    /**
+     * Add HTML to the epub document, ensuring <img> tags are handled correctly.
+     *
+     * @param html The HTML string to apply to the document.
+     * @param title The title of the page the HTML is for.
+     * @param config An array of additional settings to use in the method: toc, href, tidy
+     */
     public function add_html($html, $title, $config) {
         if ($config['tidy'] && class_exists('tidy')) {
             $tidy = new tidy();
@@ -891,6 +970,12 @@ class lessonexport_epub extends LessonLuciEPUB {
         return $title;
     }
 
+    /**
+     * Create the content skeleton if it does not exist and then pass it up to the parent method
+     * of the same signature.
+     *
+     * @see LessonLuciEPUB::addadd_spine_item()
+     */
     public function add_spine_item($data, $href = null, $fallback = null, $properties = null) {
         $globalconf = get_config('local_lessonexport');
         $style = '';
