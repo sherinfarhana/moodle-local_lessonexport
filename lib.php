@@ -909,14 +909,35 @@ class lessonexport_pdf extends pdf {
      *
      * @param file The file to apply the protection to.
      */
-    public function protect($file, $userpassword, $ownerpassword) {
+    public function protect($file) {
         global $CFG;
 
         $config = get_config('local_lessonexport');
         $userpassword = $config->pdfUserPassword;
         $ownerpassword = $config->pdfOwnerPassword;
-        $values = $config->pdfProtection;
-        $permissions = array_keys($permissions);
+        $defaults = array(
+            'print', 'modify', 'copy', 'annot-forms',
+            'fill-forms', 'extract', 'assemble', 'print-high'
+        );
+        $permissions = $config->pdfProtection;
+
+        if (strlen($permissions) > 0 && strrpos($permissions, ',') > 0) {
+            $permissions = explode(',', $permissions);
+        } else if (strlen($permissions) > 0 && !(strrpos($permissions, ',') > 0)) {
+            $permissions = array($permissions);
+        } else {
+            $permissions = array();
+        }
+
+        // Invert the selection so the user ticks boxes to _give_ permissions
+        foreach ($permissions as $permission) {
+            for ($i = 0; $i < sizeof($defaults); $i++) {
+                if ($permission == $defaults[$i]) {
+                    // delete the permission from the defaults
+                    unset($defaults[array_search($permission, $defaults)]);
+                }
+            }
+        }
 
         $this->SetProtection($permissions, $userpassword, $ownerpassword);
         $this->Output($file, 'D');
