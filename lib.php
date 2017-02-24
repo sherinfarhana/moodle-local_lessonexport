@@ -539,7 +539,7 @@ class local_lessonexport {
 
         $exp->startPage();
         // Rounded rectangle.
-        $exp->RoundedRect(9, 9, 192, 279, 6.5);
+        // $exp->RoundedRect(9, 9, 192, 279, 6.5);
         // Logo.
         $exp->image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
         // Title bar.
@@ -867,12 +867,60 @@ class lessonexport_pdf extends pdf {
         }
     }
 
-    public function header() {
+    public function Header() {
         // No header.
     }
 
-    public function footer() {
-        // No footer.
+    public function Footer() {
+        global $CFG;
+
+        $config = get_config('local_lessonexport');
+
+        // TODO:- Configure font colours, fony style and single/double row.
+        $this->SetTextColorArray(array(150,150,150));
+        $this->SetFont('helvetica', 'I', 8);
+        $this->SetY(-15);
+
+        $contents = array(
+            $config->pdfFooterTopLeft,
+            $config->pdfFooterTopMiddle,
+            $config->pdfFooterTopRight,
+            $config->pdfFooterBottomLeft,
+            $config->pdfFooterBottomMiddle,
+            $config->pdfFooterBottomRight
+        );
+
+        $index = 1;
+        $lcr = 'L';
+        foreach ($contents as $content) {
+
+            // TODO:- Make this a replace, on every content
+            if ($content = "[pagenumber]") {
+
+            }
+
+            $this->SetX(15);
+            $this->writeHTML(
+                $content,
+                false, true, true, false, $lcr
+            );
+
+            switch ($index) {
+                case 1:
+                    $lcr = 'C';
+                    break;
+                case 2:
+                    $lcr = 'R';
+                    break;
+                case 3:
+                    $lcr = 'L';
+                    $this->SetY(-5);
+                    $index = 1;
+                    break;
+            }
+
+            $index++;
+        }
     }
 
     /**
