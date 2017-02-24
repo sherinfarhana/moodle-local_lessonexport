@@ -56,7 +56,7 @@ if ($hassiteconfig) {
     $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomMiddle', get_string('pdffooterbottommiddle', 'local_lessonexport'),
                                             get_string('pdffooterbottommiddle_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterbottomRight', get_string('pdffooterbottomright', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomRight', get_string('pdffooterbottomright', 'local_lessonexport'),
                                             get_string('pdffooterbottomright_desc', 'local_lessonexport'), ''));
     // PDF permission settings.
     $choices = array(
