@@ -899,6 +899,7 @@ class lessonexport_pdf extends pdf {
         $this->SetFont('helvetica', '', 9);
         $this->SetY(-15);
 
+        $frontCoverPageNumbers = $config->pdfFrontCoverPageNumbers;
         $contents = array(
             $config->pdfFooterTopLeft,
             $config->pdfFooterTopMiddle,
@@ -913,20 +914,30 @@ class lessonexport_pdf extends pdf {
         foreach ($contents as $content) {
             // Remove <p> and <br> tags in content to maintain Y position.
             $content = preg_replace("~<\/?p>|<br>~", "", $content);
-            $pageNumber = $this->getAliasNumPage();
-            $numPages = $this->getAliasNbPages();
+            $pageNumber = $this->PageNo();
+            // $numPages = $this->getNumPages();
 
-            if ($frontCoverPageNumbers || !$frontCoverPageNumbers && $pageNumber > 1) {
-                // Replace any [pagenumber] shortcodes the number on the current page.
-                if (!(strpos($content, '[pagenumber]') === false)) {
-                    $content = str_replace('[pagenumber]', $pageNumber, $content);
-                }
-
-                // Replace any [numpages] shortcodes with the number of pages in the document.
-                if (!(strpos($content, '[numpages]') === false)) {
-                    $content = str_replace('[numpages]', $numPages, $content);
+            // Replace any [pagenumber] shortcodes the number on the current page.
+            if (!(strpos($content, '[pagenumber]') === false)) {
+                if ($frontCoverPageNumbers == true || $frontCoverPageNumbers == false && $pageNumber > 1) {
+                    if ($frontCoverPageNumbers == true) {
+                        $content = str_replace('[pagenumber]', $pageNumber, $content);
+                    } else {
+                        $content = str_replace('[pagenumber]', $pageNumber-1, $content);
+                    }
+                } else {
+                    $content = '';
                 }
             }
+
+            // Replace any [numpages] shortcodes with the number of pages in the document.
+            // if (!(strpos($content, '[numpages]') === false)) {
+            //     if ($frontCoverPageNumbers == true || $frontCoverPageNumbers == false && $pageNumber > 1) {
+            //         $content = str_replace('[numpages]', $numPages, $content);
+            //     } else {
+            //         $content = '';
+            //     }
+            // }
 
             // Replace any [date] shortcodes with the current date.
             if (!(strpos($content, '[date]') === false)) {
