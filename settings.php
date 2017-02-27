@@ -28,36 +28,51 @@ if ($hassiteconfig) {
     $ADMIN->add('modules', new admin_category('lessonexport', 'Lesson Export'));
     $page = new admin_settingpage('lessonexportpage', 'Lesson Export');
 
-    $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle', get_string('customstyle', 'local_lessonexport'),
+    $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle',
+                                            get_string('customstyle', 'local_lessonexport'),
                                             get_string('customstyle_desc', 'local_lessonexport'), '', PARAM_RAW));
 
-    $page->add(new admin_setting_configtext('local_lessonexport/customfont', get_string('customfont', 'local_lessonexport'),
+    $page->add(new admin_setting_configtext('local_lessonexport/customfont',
+                                            get_string('customfont', 'local_lessonexport'),
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
 
-    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfUserPassword', get_string('pdfuserpassword', 'local_lessonexport'),
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfUserPassword',
+                                            get_string('pdfuserpassword', 'local_lessonexport'),
                                             get_string('pdfuserpassword_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfOwnerPassword', get_string('pdfownerpassword', 'local_lessonexport'),
+    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfOwnerPassword',
+                                            get_string('pdfownerpassword', 'local_lessonexport'),
                                             get_string('pdfownerpassword_desc', 'local_lessonexport'), ''));
 
     // Footer text areas.
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopLeft', get_string('pdffootertopleft', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopLeft',
+                                            get_string('pdffootertopleft', 'local_lessonexport'),
                                             get_string('pdffootertopleft_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopMiddle', get_string('pdffootertopmiddle', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopMiddle',
+                                            get_string('pdffootertopmiddle', 'local_lessonexport'),
                                             get_string('pdffootertopmiddle_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopRight', get_string('pdffootertopright', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopRight',
+                                            get_string('pdffootertopright', 'local_lessonexport'),
                                             get_string('pdffootertopright_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomLeft', get_string('pdffooterbottomleft', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomLeft',
+                                            get_string('pdffooterbottomleft', 'local_lessonexport'),
                                             get_string('pdffooterbottomleft_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomMiddle', get_string('pdffooterbottommiddle', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomMiddle',
+                                            get_string('pdffooterbottommiddle', 'local_lessonexport'),
                                             get_string('pdffooterbottommiddle_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomRight', get_string('pdffooterbottomright', 'local_lessonexport'),
+    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomRight',
+                                            get_string('pdffooterbottomright', 'local_lessonexport'),
                                             get_string('pdffooterbottomright_desc', 'local_lessonexport'), ''));
+
+    $page->add(new admin_setting_checkbox('local_lessonexport/pdfFrontCoverPageNumbers',
+                                            get_string('pdffrontcoverpagenumbers', 'local_lessonexport'),
+                                            get_string('pdffrontcoverpagenumbers_desc', 'local_lessonexport'), 1));
+
     // PDF permission settings.
     $choices = array(
         'print'     => "Print the document",

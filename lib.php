@@ -913,17 +913,19 @@ class lessonexport_pdf extends pdf {
         foreach ($contents as $content) {
             // Remove <p> and <br> tags in content to maintain Y position.
             $content = preg_replace("~<\/?p>|<br>~", "", $content);
+            $pageNumber = $this->getAliasNumPage();
+            $numPages = $this->getAliasNbPages();
 
-            // Replace any [pagenumber] shortcodes the number on the current page.
-            if (!(strpos($content, '[pagenumber]') === false)) {
-                $pageNumber = $this->getAliasNumPage();
-                $content = str_replace('[pagenumber]', $pageNumber, $content);
-            }
+            if ($frontCoverPageNumbers || !$frontCoverPageNumbers && $pageNumber > 1) {
+                // Replace any [pagenumber] shortcodes the number on the current page.
+                if (!(strpos($content, '[pagenumber]') === false)) {
+                    $content = str_replace('[pagenumber]', $pageNumber, $content);
+                }
 
-            // Replace any [numpages] shortcodes with the number of pages in the document.
-            if (!(strpos($content, '[numpages]') === false)) {
-                $numPages = $this->getAliasNbPages();
-                $content = str_replace('[numpages]', $numPages, $content);
+                // Replace any [numpages] shortcodes with the number of pages in the document.
+                if (!(strpos($content, '[numpages]') === false)) {
+                    $content = str_replace('[numpages]', $numPages, $content);
+                }
             }
 
             // Replace any [date] shortcodes with the current date.
