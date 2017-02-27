@@ -253,7 +253,7 @@ class local_lessonexport {
      * The return object includes the lesson and cm as sub-objects.
      *
      * @return object|null null if none left to export
-     */    
+     */
 	protected static function get_next_from_queue() {
         global $DB;
 
@@ -278,7 +278,7 @@ class local_lessonexport {
 
         // Add the lesson + cm objects to the return object.
         if (!$lesson || $lesson->id != $nextitem->lessonid) {
-            if (!$lesson == $DB->get_record('lesson', array('id' => $nextitem->lessonid))) {            
+            if (!$lesson == $DB->get_record('lesson', array('id' => $nextitem->lessonid))) {
                 mtrace("Page updated for lesson ID {$nextitem->lessonid}, which does not exist\n");
                 return self::get_next_from_queue();
             }
@@ -302,7 +302,7 @@ class local_lessonexport {
         global $DB;
         $DB->delete_records('local_lessonexport_queue', array('id' => $lesson->queueid));
     }
-	
+
     protected function load_pages() {
         global $DB, $USER;
 
@@ -377,13 +377,13 @@ class local_lessonexport {
 
     protected function start_export($download) {
         global $CFG;
-        $exp = new lessonexport_pdf();            
+        $exp = new lessonexport_pdf();
         $restricttocontext = false;
         if ($download) {
             $restricttocontext = context_module::instance($this->cm->id);
         }
         $exp->use_direct_image_load($restricttocontext);
-        $exp->SetMargins(20, 10, -1, true); // Set up wider left margin than default.        
+        $exp->SetMargins(20, 10, -1, true); // Set up wider left margin than default.
 
         return $exp;
     }
@@ -393,14 +393,14 @@ class local_lessonexport {
         $exp->addPage();
         $exp->setDestination('pageid-'.$page->id);
         $exp->writeHTML('<h2>'.$page->title.'</h2>');
-        $exp->writeHTML($page->contents);        
+        $exp->writeHTML($page->contents);
     }
 
     protected function end_export($exp, $download) {
         global $CFG;
 
         $filename = $this->get_filename($download);
-        
+
         if ($this->exporttype == self::EXPORT_EPUB) {
             /** @var LuciEPUB $exp */
             $exp->generate_nav();
@@ -462,7 +462,7 @@ class local_lessonexport {
 
         $exp->startPage();
         // Rounded rectangle.
-        $exp->RoundedRect(9, 9, 192, 279, 6.5);
+        // $exp->RoundedRect(9, 9, 192, 279, 6.5);
         // Logo.
         $exp->Image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
         // Title bar.
@@ -696,6 +696,17 @@ class lessonexport_pdf extends pdf {
     protected $directimageload = false;
     protected $restricttocontext = false;
 
+    private $cm;
+    private $lesson;
+
+    public function setCourseModule($cm) {
+        $this->cm = $cm;
+    }
+
+    public function setLesson($lesson) {
+        $this->lesson = $lesson;
+    }
+
     public function use_direct_image_load($restricttocontext = false) {
         $this->directimageload = true;
         $this->restricttocontext = $restricttocontext;
@@ -737,10 +748,10 @@ class lessonexport_pdf extends pdf {
     public function Image($file, $x = '', $y = '', $w = 0, $h = 0, $type = '', $link = '', $align = '', $resize = false,
                           $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false, $hidden = false,
                           $fitonpage = false, $alt = false, $altimgs = array()) {
-        
+
         $config = get_config('local_lessonexport');
         $exportstrict = $config->exportstrict;
-        
+
         if ($exportstrict) {
             if ($this->directimageload) {
                 // Get the image data directly from the Moodle files API (needed when generating within cron, instead of downloading).
@@ -761,8 +772,8 @@ class lessonexport_pdf extends pdf {
                           $fitbox, $hidden, $fitonpage, $alt, $altimgs);
             } catch (Exception $e) {
                 $this->writeHTML(get_string('failedinsertimage', 'local_lessonexport', $file));
-            }            
-        } 
+            }
+        }
         else {
             try {
                 if ($this->directimageload) {
@@ -792,7 +803,92 @@ class lessonexport_pdf extends pdf {
     }
 
     public function Footer() {
-        // No footer.
+        global $CFG;
+        global $DB;
+
+        $config = get_config('local_lessonexport');
+
+        // TODO:- Configure font colours, fony style and single/double row.
+        $this->SetTextColorArray(array(150,150,150));
+        $this->SetFont('helvetica', '', 9);
+        $this->SetY(-15);
+
+        $frontCoverPageNumbers = $config->pdfFrontCoverPageNumbers;
+        $contents = array(
+            $config->pdfFooterTopLeft,
+            $config->pdfFooterTopMiddle,
+            $config->pdfFooterTopRight,
+            $config->pdfFooterBottomLeft,
+            $config->pdfFooterBottomMiddle,
+            $config->pdfFooterBottomRight
+        );
+
+        $lcr = 'L';
+        $iterator = 1;
+        foreach ($contents as $content) {
+            // Remove <p> and <br> tags in content to maintain Y position.
+            $content = preg_replace("~<\/?p>|<br>~", "", $content);
+            $pageNumber = $this->getAliasNumPage();
+            $numPages = $this->getAliasNbPages();
+
+            if ($frontCoverPageNumbers || !$frontCoverPageNumbers && $pageNumber > 1) {
+                // Replace any [pagenumber] shortcodes the number on the current page.
+                if (!(strpos($content, '[pagenumber]') === false)) {
+                    $content = str_replace('[pagenumber]', $pageNumber, $content);
+                }
+
+                // Replace any [numpages] shortcodes with the number of pages in the document.
+                if (!(strpos($content, '[numpages]') === false)) {
+                    $content = str_replace('[numpages]', $numPages, $content);
+                }
+            }
+
+            // Replace any [date] shortcodes with the current date.
+            if (!(strpos($content, '[date]') === false)) {
+                $date = date("j F Y");
+                $content = str_replace('[date]', $date, $content);
+            }
+
+            // Replace any [coursename] shortcodes with the course name being exported.
+            if (!(strpos($content, '[coursename]') === false)) {
+                $course = $this->cm->course;
+                $course = $DB->get_record("course", array('id' => $course));
+                $courseName = $course->fullname;
+                $content = str_replace('[coursename]', $courseName, $content);
+            }
+
+            // Replace any [lessonname] shortcodes with the lesson name being exported.
+            if (!(strpos($content, '[lessonname]') === false)) {
+                $lesson = $this->lesson;
+                $lessonName = $lesson->name;
+                $content = str_replace('[lessonname]', $lessonName, $content);
+            }
+
+            // Reset the position to the left margin.
+            // Each write will just align text from here.
+            $this->SetX(15);
+            $this->writeHTML(
+                $content,
+                false, true, true, false, $lcr
+            );
+
+            // Alter the text alignment based on the iterator.
+            switch ($iterator) {
+                case 1:
+                    $lcr = 'C';
+                    break;
+                case 2:
+                    $lcr = 'R';
+                    break;
+                case 3:
+                    $lcr = 'L';
+                    $this->SetY(-10);
+                    $iterator = 0;
+                    break;
+            }
+
+            $iterator++;
+        }
     }
 
     /**
@@ -830,7 +926,7 @@ class lessonexport_pdf extends pdf {
         $permissions=array('print', 'modify', 'copy', 'annot-forms', 'fill-forms', 'extract', 'assemble', 'print-high');
         $this->SetProtection($permissions, $userPassword, $ownerPassword);
         $this->Output($file, 'D');
-                
+
         return $file;
     }
 }

@@ -10,11 +10,18 @@ Usage
 Once the plugin is installed, you can visit a lesson, then click on the new 'Export as PDF' link that appears
 in the activity administration block (with javascript enabled, similar links are inserted on the top-right corner of the page).
 
-There is an additional global setting which allows a copy of any lessons on the site to be sent (as a PDF) to a given email address,
-whenever they are updated (note, this will not export all lessons on the site the first time it is configured, it only sends those
-that have been updated since the email address was first entered).
-
 There is also a global setting to define additional custom style rules that will take effect only in the exported document.
+
+When editing footer content in the Lesson Export settings, there are several shortcodes you may use to add useful information to the
+document.
+
+|   Shortcode  	| Output                                          	| Notes                                                          	|
+|:------------:	|-------------------------------------------------	|----------------------------------------------------------------	|
+| [pagenumber] 	| The number of the page, per-page.               	| This is a single integer, without additional characters.       	|
+|  [numpages]  	| The amount of pages total in the document.      	| This is a single integer, without additional characters.       	|
+|    [date]    	| The current date at the point of the export.    	| In the format "dd M YYYY". For example; 27 February 2017.      	|
+| [coursename] 	| The name of the course, as-is listed on Moodle. 	| Printed without any additional characters such as punctuation. 	|
+| [lessonname] 	| The name of the lesson, as-is listed on Moodle. 	| Printed without any additional characters such as punctuation. 	|
 
 Customising
 ===========
