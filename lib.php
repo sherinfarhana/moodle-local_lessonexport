@@ -376,6 +376,8 @@ class local_lessonexport {
             $exp->set_publisher(get_string('publishername', 'local_lessonexport'));
         } else { // PDF.
             $exp = new lessonexport_pdf();
+            $exp->setCourseModule($this->cm);
+            $exp->setLesson($this->lesson);
             $restricttocontext = false;
             if ($download) {
                 $restricttocontext = context_module::instance($this->cm->id);
@@ -772,9 +774,24 @@ function local_lessonexport_get_image_file($fileurl, $restricttocontext = null) 
  * Class lessonexport_pdf
  */
 class lessonexport_pdf extends pdf {
-
     protected $directimageload = false;
     protected $restricttocontext = false;
+
+    private $cm;
+    private $lesson;
+
+    // public function __construct() {
+        // $this->lesson = $lesson;
+        // $this->cm = $cm;
+    // }
+
+    public function setCourseModule($cm) {
+        $this->cm = $cm;
+    }
+
+    public function setLesson($lesson) {
+        $this->lesson = $lesson;
+    }
 
     public function use_direct_image_load($restricttocontext = false) {
         $this->directimageload = true;
@@ -873,12 +890,13 @@ class lessonexport_pdf extends pdf {
 
     public function Footer() {
         global $CFG;
+        global $DB;
 
         $config = get_config('local_lessonexport');
 
         // TODO:- Configure font colours, fony style and single/double row.
         $this->SetTextColorArray(array(150,150,150));
-        $this->SetFont('helvetica', 'I', 8);
+        $this->SetFont('helvetica', '', 9);
         $this->SetY(-15);
 
         $contents = array(
@@ -890,22 +908,56 @@ class lessonexport_pdf extends pdf {
             $config->pdfFooterBottomRight
         );
 
-        $index = 1;
+        $iterator = 1;
         $lcr = 'L';
         foreach ($contents as $content) {
+            // Remove <p> and <br> tags in content to maintain Y position.
+            $content = preg_replace("~<\/?p>|<br>~", "", $content);
 
-            // TODO:- Make this a replace, on every content
-            if ($content = "[pagenumber]") {
-
+            // Replace any [pagenumber] shortcodes the number on the current page.
+            if (!(strpos($content, '[pagenumber]') === false)) {
+                $pageNumber = $this->getAliasNumPage();
+                $content = str_replace('[pagenumber]', $pageNumber, $content);
             }
 
+            // Replace any [numpages] shortcodes with the number of pages in the document.
+            if (!(strpos($content, '[numpages]') === false)) {
+                $numPages = $this->getAliasNbPages();
+                $content = str_replace('[numpages]', $numPages, $content);
+            }
+
+            // Replace any [date] shortcodes with the current date.
+            if (!(strpos($content, '[date]') === false)) {
+                $date = date("j F Y");
+                $content = str_replace('[date]', $date, $content);
+            }
+
+            // Replace any [course] shortcodes with the current course context.
+            if (!(strpos($content, '[coursename]') === false)) {
+                $course = $this->cm->course;
+                $course = $DB->get_record("course", array('id' => $course));
+                $courseName = $course->fullname;
+
+                $content = str_replace('[coursename]', $courseName, $content);
+            }
+
+            if (!(strpos($content, '[lessonname]') === false)) {
+                $lesson = $this->lesson;
+                $lessonName = $lesson->name;
+
+                $content = str_replace('[lessonname]', $lessonName, $content);
+            }
+
+            // Reset the position to the left margin.
+            // Each write will just align text from here.
             $this->SetX(15);
             $this->writeHTML(
                 $content,
                 false, true, true, false, $lcr
             );
 
-            switch ($index) {
+            // Alter the text alignment based on the iterator.
+            switch ($iterator) {
                 case 1:
                     $lcr = 'C';
                     break;
@@ -914,12 +966,12 @@ class lessonexport_pdf extends pdf {
                     break;
                 case 3:
                     $lcr = 'L';
-                    $this->SetY(-5);
-                    $index = 1;
+                    $this->SetY(-10);
+                    $iterator = 0;
                     break;
             }
 
-            $index++;
+            $iterator++;
         }
     }
 
