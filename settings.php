@@ -69,7 +69,7 @@ if ($hassiteconfig) {
                                             get_string('pdffooterbottomright', 'local_lessonexport'),
                                             get_string('pdffooterbottomright_desc', 'local_lessonexport'), ''));
 
-    $page->add(new admin_setting_checkbox('local_lessonexport/pdfFrontCoverPageNumbers',
+    $page->add(new admin_setting_configcheckbox('local_lessonexport/pdfFrontCoverPageNumbers',
                                             get_string('pdffrontcoverpagenumbers', 'local_lessonexport'),
                                             get_string('pdffrontcoverpagenumbers_desc', 'local_lessonexport'), 1));
 
