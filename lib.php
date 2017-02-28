@@ -515,17 +515,17 @@ class local_lessonexport {
         $imgel = html_writer::empty_tag('img', array('src' => $img, 'style' => 'max-width: 90%;'));
         $html .= html_writer::div($imgel, 'fronttitle', array('style' => 'text-align: center; padding: 1em 0;'));
         $html .= html_writer::div(' ', 'fronttitletop', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: #b8cce4; margin-top: 1em;'));
-        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: #4f81bd;
-                                                                  min-height: 2em; text-align: center; padding-top: 0.5em;
-                                                                  size: 1em; margin: 0;' ));
+                                                                               background-color: rgb(18, 160, 83); margin-top: 1em;'));
+        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: rgb(18, 160, 83);
+                                                                  min-height: 2em; text-align: center; padding-top: 0.8em;
+                                                                  size: 1em; margin: 0; color: #fff;' ));
         $html .= html_writer::div(' ', 'fronttitlebottom', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: #4bacc6; margin-bottom: 1em;'));
+                                                                               background-color: rgb(18, 160, 83); margin-bottom: 1em;'));
         $html .= html_writer::div($description, 'frontdescription', array('style' => 'margin: 0.5em 1em;'));
         $html .= html_writer::div($info, 'frontinfo', array('style' => 'margin: 2em 1em'));
 
-        $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
-                                                                       width: 90%;'));
+        // $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
+        //                                                                width: 90%;'));
 
         $exp->add_spine_item($html, 'cover.html');
     }
@@ -544,16 +544,19 @@ class local_lessonexport {
         // $exp->RoundedRect(9, 9, 192, 279, 6.5);
         // Logo.
         $exp->image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
+
         // Title bar.
-        $exp->Rect(9, 87.5, 192, 2.5, 'F', array(), array(18, 160, 83));
-        $exp->Rect(9, 90, 192, 30, 'F', array(), array(18, 160, 83));
-        $exp->Rect(9, 120, 192, 2.5, 'F', array(), array(18, 160, 83));
+        $exp->Rect(0, 87.5, 220, 2.5, 'F', array(), array(18, 160, 83));
+        $exp->Rect(0, 90, 220, 30, 'F', array(), array(18, 160, 83));
+        $exp->Rect(0, 120, 220, 2.5, 'F', array(), array(18, 160, 83));
 
         // Title text.
         $title = $this->lesson->name;
         $exp->SetFontSize(20);
-        $exp->Text(9, 100, $title, false, false, true, 0, 0, 'C', false, '', 1, false, 'T', 'C');
-        $exp->SetFontSize(12); // Set back to default.
+        $exp->SetTextColorArray(array(255,255,255));
+        $exp->Text(10, 100, $title, false, false, true, 0, 0, 'C', false, '', 1, false, 'T', 'C');
+        $exp->SetTextColorArray(array(0,0,0)); // Set back to default colour.
+        $exp->SetFontSize(11); // Set back to default.
 
         // Description.
         $description = format_text($this->lesson->intro, $this->lesson->introformat);
