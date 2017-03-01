@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('lessonexport', 'Lesson Export'));
-    $page = new admin_settingpage('lessonexportpage', 'Lesson Export');
+    $ADMIN->add('modules', new admin_category('lessonexport', get_string('pluginname', 'local_lessonexport')));
+    $page = new admin_settingpage('lessonexportpage', get_string('pluginname', 'local_lessonexport'));
 
     $customStyleDefault = '
         html, body {
@@ -79,24 +79,24 @@ if ($hassiteconfig) {
 
     // PDF permission settings.
     $choices = array(
-        'print'     => "Print the document",
-        'modify'    => "Modify the document",
-        'copy'      => "Copy the document",
-        'annotate'  => "Annotate documents",
-        'forms'     => "Fill forms on the document",
-        'extract'   => "Extract pages fromt he document",
-        'assemble'  => "Assemble the document",
-        'high-def'  => "Print the document in high definition"
+        get_string('printpermission', 'local_lessonexport') => get_string('printpermission_desc', 'local_lessonexport'),
+        get_string('modifypermission', 'local_lessonexport') => get_string('modifypermission_desc', 'local_lessonexport'),
+        get_string('copypermission', 'local_lessonexport') => get_string('copypermission_desc', 'local_lessonexport'),
+        get_string('annotatepermission', 'local_lessonexport') => get_string('annotatepermission_desc', 'local_lessonexport'),
+        get_string('formfillpermission', 'local_lessonexport') => get_string('formfillpermission_desc', 'local_lessonexport'),
+        get_string('extractpermission', 'local_lessonexport') => get_string('extractpermission_desc', 'local_lessonexport'),
+        get_string('assemblepermission', 'local_lessonexport') => get_string('assemblepermission_desc', 'local_lessonexport'),
+        get_string('highdefpermission', 'local_lessonexport') => get_string('highdefpermission_desc', 'local_lessonexport')
     );
     $defaults = array(
-        // 'print'     => 'enabled',   // print
-        //'modify'    => 'enabled',  // modify
-        //'copy'      => 'enabled',  // copy
-        //'annotate'  => 'enabled',  // annotate
-        // 'forms'     => 'enabled',   // forms
-        //'extract'   => 'enabled',  // extract
-        //'assemble'  => 'enabled',  // assemble
-        // 'high-def'  => 'enabled'    // high-def
+        // get_string('printpermission', 'local_lessonexport')     => 'enabled',   // print
+        // get_string('modifypermission', 'local_lessonexport')    => 'enabled',   // modify
+        // get_string('copypermission', 'local_lessonexport')      => 'enabled',   // copy
+        // get_string('annotatepermission', 'local_lessonexport')  => 'enabled',   // annotate
+        // get_string('formfillpermission', 'local_lessonexport')  => 'enabled',   // forms
+        // get_string('extractpermission', 'local_lessonexport')   => 'enabled',   // extract
+        // get_string('assemblepermission', 'local_lessonexport')  => 'enabled',   // assemble
+        // get_string('highdefpermission', 'local_lessonexport')   => 'enabled'    // high-def
     );
     $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfProtection', get_string('pdfprotection','local_lessonexport'),
                                             get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));

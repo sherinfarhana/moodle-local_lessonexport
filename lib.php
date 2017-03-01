@@ -1032,8 +1032,14 @@ class lessonexport_pdf extends pdf {
         $userpassword = $config->pdfUserPassword;
         $ownerpassword = $config->pdfOwnerPassword;
         $defaults = array(
-            'print', 'modify', 'copy', 'annot-forms',
-            'fill-forms', 'extract', 'assemble', 'print-high'
+            get_string('printpermission', 'local_lessonexport'),
+            get_string('modifypermission', 'local_lessonexport'),
+            get_string('copypermission', 'local_lessonexport'),
+            get_string('annotatepermission', 'local_lessonexport'),
+            get_string('formfillpermission', 'local_lessonexport'),
+            get_string('extractpermission', 'local_lessonexport'),
+            get_string('assemblepermission', 'local_lessonexport'),
+            get_string('highdefpermission', 'local_lessonexport'),
         );
         $permissions = $config->pdfProtection;
 
