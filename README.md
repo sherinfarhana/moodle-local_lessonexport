@@ -16,7 +16,6 @@ document.
 |   Shortcode  	| Output                                          	| Notes                                                          	|
 |:------------:	|-------------------------------------------------	|----------------------------------------------------------------	|
 | [pagenumber] 	| The number of the page, per-page.               	| This is a single integer, without additional characters.       	|
-|  [numpages]  	| The amount of pages total in the document.      	| This is a single integer, without additional characters.       	|
 |    [date]    	| The current date at the point of the export.    	| In the format "dd M YYYY". For example; 27 February 2017.      	|
 | [coursename] 	| The name of the course, as-is listed on Moodle. 	| Printed without any additional characters such as punctuation. 	|
 | [lessonname] 	| The name of the lesson, as-is listed on Moodle. 	| Printed without any additional characters such as punctuation. 	|
