@@ -27,6 +27,7 @@ There are many globally configurable options for exporting PDF documents from a 
 
 ## Common Settings
 - Strict mode - Throw exceptions on content errors
+- Cover photo banner colour
 
 ## PDF Settings
 - Configurable PDF protection settings
