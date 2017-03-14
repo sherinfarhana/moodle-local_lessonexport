@@ -104,5 +104,8 @@ if ($hassiteconfig) {
     $page->add(new admin_setting_configcheckbox('local_lessonexport/exportstrict', get_string('exportstrict', 'local_lessonexport'),
     get_string('exportstrict_desc', 'local_lessonexport'), 0));
 
+    $page->add(new admin_setting_configcolourpicker('local_lessonexport/coverColour', get_string('covercolour', 'local_lessonexport'),
+                                            get_string('covercolour_desc', 'local_lessonexport'), '#12A053'));
+
     $ADMIN->add('lessonexport', $page);
 }

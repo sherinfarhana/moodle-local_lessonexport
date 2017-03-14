@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
 require_once($CFG->dirroot.'/local/lessonexport/lib/luciepub/LuciEPUB.php');
+require_once($CFG->dirroot.'/mod/lesson/locallib.php');
 
 class local_lessonexport {
     /** @var object */
@@ -273,16 +274,12 @@ class local_lessonexport {
     protected function load_pages() {
         global $DB, $USER;
 
-        $sql = "SELECT p.id, p.title, p.contents, p.timecreated, p.timemodified
-                  FROM {lesson_pages} p
-                  LEFT JOIN {local_lessonexport_order} xo ON xo.pageid = p.id
-                 WHERE p.lessonid = :lessonid
-                 ORDER BY xo.sortorder, p.title";
-        $params = array('lessonid' => $this->lesson->id);
-        $pages = $DB->get_records_sql($sql, $params);
+        $lesson = new Lesson($this->lesson);
+        $pages = $lesson->load_all_pages();
         $pageids = array_keys($pages);
 
         $context = context_module::instance($this->cm->id);
+
         foreach ($pages as $page) {
             // Fix pluginfile urls.
             $page->contents = file_rewrite_pluginfile_urls($page->contents, 'pluginfile.php', $context->id,
@@ -539,6 +536,8 @@ class local_lessonexport {
     protected function add_coversheet_pdf(pdf $exp) {
         global $CFG;
 
+        $config = get_config('local_lessonexport');
+
         $exp->startPage();
         // Rounded rectangle.
         // $exp->RoundedRect(9, 9, 192, 279, 6.5);
@@ -546,9 +545,17 @@ class local_lessonexport {
         $exp->image($CFG->dirroot.'/local/lessonexport/pix/logo.png', 52, 27, 103, 36);
 
         // Title bar.
-        $exp->Rect(0, 87.5, 220, 2.5, 'F', array(), array(18, 160, 83));
-        $exp->Rect(0, 90, 220, 30, 'F', array(), array(18, 160, 83));
-        $exp->Rect(0, 120, 220, 2.5, 'F', array(), array(18, 160, 83));
+        $hexadecimal = null;
+        if (empty($config->coverColour)) {
+            $hexadecimal = '#12A053';
+        } else {
+            $hexadecimal = $config->coverColour;
+        }
+
+        $rgbColour = Util::hex_to_rgb($hexadecimal);
+        $exp->Rect(0, 87.5, 220, 2.5, 'F', array(), $rgbColour);
+        $exp->Rect(0, 90, 220, 30, 'F', array(), $rgbColour);
+        $exp->Rect(0, 120, 220, 2.5, 'F', array(), $rgbColour);
 
         // Title text.
         $title = $this->lesson->name;
@@ -1145,5 +1152,30 @@ class lessonexport_epub extends LessonLuciEPUB {
         }
 
         return parent::add_spine_item($data, $href, $fallback, $properties);
+    }
+}
+
+class Util {
+    public static function hex_to_rgb($hex) {
+        global $CFG;
+
+
+
+        // If there is a hash symbol with the hex, remove it
+        if (strpos($hex, '#') !== false) {
+            $hex = substr($hex, 1);
+        }
+
+        // Split the hexadecimal into RGB chunks
+        $hexColour = str_split($hex, 2);
+
+        // Convert the base16 hex values into base10 decimals
+        $rgbColour = array(
+            hexdec($hexColour[0]),
+            hexdec($hexColour[1]),
+            hexdec($hexColour[2])
+        );
+
+        return $rgbColour;
     }
 }
