@@ -276,11 +276,17 @@ class local_lessonexport {
 
         $lesson = new Lesson($this->lesson);
         $pages = $lesson->load_all_pages();
+
         $pageids = array_keys($pages);
 
         $context = context_module::instance($this->cm->id);
 
         foreach ($pages as $page) {
+            $answers = $page->get_answers();
+
+            // Append answers to the end of question pages
+            $page->contents = $this->format_answer($page);
+
             // Fix pluginfile urls.
             $page->contents = file_rewrite_pluginfile_urls($page->contents, 'pluginfile.php', $context->id,
                                                           'mod_lesson', 'page_contents', $page->id);
@@ -296,6 +302,22 @@ class local_lessonexport {
         return $pages;
     }
 
+    protected function format_answer($page) {
+        $pagetype = $page->get_typestring();
+        $contents = $page->contents;
+        $answers = $page->answers;
+        $qtype = $page->qtype;
+
+        $contents .= "<div class='pdf_answer_".$pagetype."_wrapper'>";
+
+        foreach ($answers as $answer) {
+            $contents .= "<div class='pdf_answer_$pagetype'>$answer->answer</div>";
+        }
+
+        $contents .= "</div>";
+
+        return $contents;
+    }
 
     /**
      * Fix internal TOC links to include the pageid (to make them unique across all pages).
@@ -615,7 +637,10 @@ function local_lessonexport_extends_navigation($unused) {
 
 function local_lessonexport_extend_navigation($unused) {
     global $PAGE, $DB, $USER;
-    if (!$PAGE->cm || $PAGE->cm->modname != 'lesson') {
+
+    $settingsnav = $PAGE->settingsnav;
+
+    if (!$PAGE->cm || $PAGE->cm->modname != 'lesson' || empty($settingsnav)) {
         return;
     }
     $groupid = groups_get_activity_group($PAGE->cm);
@@ -624,7 +649,7 @@ function local_lessonexport_extend_navigation($unused) {
     if (!$links = local_lessonexport::get_links($PAGE->cm, $USER->id, $groupid)) {
         return;
     }
-    $settingsnav = $PAGE->settingsnav;
+
     $modulesettings = $settingsnav->get('modulesettings');
     if (!$modulesettings) {
         $modulesettings = $settingsnav->prepend(get_string('pluginadministration', 'mod_lesson'), null,

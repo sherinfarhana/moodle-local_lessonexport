@@ -25,12 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017031400;
+$plugin->version   = 2017031500;
 $plugin->requires  = 2014051200; // Moodle 2.7.
 $plugin->cron      = DAYSECS;
 $plugin->component = 'local_lessonexport';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "2.7+ (Build: 2017030100)";
+$plugin->release   = "2.7+ (Build: 2017031500)";
 
 $plugin->dependencies = array(
     'mod_lesson' => ANY_VERSION,
