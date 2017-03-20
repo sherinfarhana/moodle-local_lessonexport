@@ -28,7 +28,8 @@ require_once($CFG->libdir.'/pdflib.php');
 require_once($CFG->dirroot.'/local/lessonexport/lib/luciepub/LuciEPUB.php');
 require_once($CFG->dirroot.'/mod/lesson/locallib.php');
 
-class local_lessonexport {
+class local_lessonexport
+{
     /** @var object */
     protected $cm;
     /** @var object */
@@ -45,7 +46,8 @@ class local_lessonexport {
 
     protected static $exporttypes = array(self::EXPORT_EPUB, self::EXPORT_PDF);
 
-    public function __construct($cm, $lesson, $exporttype) {
+    public function __construct($cm, $lesson, $exporttype)
+    {
         $this->cm = $cm;
         $this->lesson = $lesson;
         $this->lessoninfo = new local_lessonexport_info();
@@ -64,7 +66,8 @@ class local_lessonexport {
      *
      * @param object The Course Module from the current context.
      */
-    public static function get_links($cm) {
+    public static function get_links($cm)
+    {
         $context = context_module::instance($cm->id);
         $ret = array();
 
@@ -85,7 +88,8 @@ class local_lessonexport {
      *
      * @throws required_capability_exception if the user does not have the capability.
      */
-    public function check_access() {
+    public function check_access()
+    {
         global $USER;
         $context = context_module::instance($this->cm->id);
         $capability = 'local/lessonexport:export'.$this->exporttype;
@@ -98,15 +102,18 @@ class local_lessonexport {
      * @param bool $download (optional) true to send the file directly to the user's browser
      * @return string the path to the generated file, if not downloading directly
      */
-    public function export($download = true) {
+    public function export($download = true)
+    {
         // Raise the max execution time to 5 min, not 30 seconds.
         @set_time_limit(300);
 
-        $pages = $this->load_pages();
-        $exp = $this->start_export($download);
-        $this->add_coversheet($exp);
-        foreach ($pages as $page) {
-            $this->export_page($exp, $page);
+        $pages = $this->load_pages();           // PAGES ARE FINE
+                                                // PAGES ARE GARBLED
+
+        $exp = $this->start_export($download);  // DOESN'T GARBLE CONTENT
+        $this->add_coversheet($exp);            // DOESN'T GARBLE CONTENT
+        foreach ($pages as $page) {             //
+            $this->export_page($exp, $page);    // PAGES ARE GARBLED
         }
         return $this->end_export($exp, $download);
     }
@@ -116,7 +123,8 @@ class local_lessonexport {
      * This includes checking the update_queue for changes to email
      * an exported document to the configured email address.
      */
-    public static function cron() {
+    public static function cron()
+    {
         $config = get_config('local_lessonexport');
         if (empty($config->publishemail)) {
             return; // No email specified.
@@ -179,7 +187,8 @@ class local_lessonexport {
      *
      * @param $config
      */
-    protected static function update_queue($config) {
+    protected static function update_queue($config)
+    {
         global $DB;
 
         if (empty($config->lastqueueupdate)) {
@@ -222,7 +231,8 @@ class local_lessonexport {
      *
      * @return object|null null if none left to export
      */
-    protected static function get_next_from_queue() {
+    protected static function get_next_from_queue()
+    {
         global $DB;
 
         static $cm = null;
@@ -266,52 +276,81 @@ class local_lessonexport {
      *
      * @param object $lesson
      */
-    protected static function remove_from_queue($lesson) {
+    protected static function remove_from_queue($lesson)
+    {
         global $DB;
         $DB->delete_records('local_lessonexport_queue', array('id' => $lesson->queueid));
     }
 
-    protected function load_pages() {
+    protected function load_pages()
+    {
         global $DB, $USER;
 
         $lesson = new Lesson($this->lesson);
         $pages = $lesson->load_all_pages();
-
         $pageids = array_keys($pages);
 
         $context = context_module::instance($this->cm->id);
 
         foreach ($pages as $page) {
             $answers = $page->get_answers();
+            $contents = $page->contents;
 
-            // Append answers to the end of question pages
-            $page->contents = $this->format_answer($page);
+            // Append answers to the end of question pages.
+            $contents = $this->format_answers($page);
 
             // Fix pluginfile urls.
-            $page->contents = file_rewrite_pluginfile_urls($page->contents, 'pluginfile.php', $context->id,
+            $contents = file_rewrite_pluginfile_urls($contents, 'pluginfile.php', $context->id,
                                                           'mod_lesson', 'page_contents', $page->id);
-            $page->contents = format_text($page->contents, FORMAT_MOODLE, array('overflowdiv' => true, 'allowid' => true));
+
+            $contents = format_text($contents, FORMAT_MOODLE, array('overflowdiv' => false, 'allowid' => true, 'para' => false));
 
             // Fix internal links.
-            $this->fix_internal_links($page, $pageids);
+            // Can't really use this with the content being a local variable.
+            // $this->fix_internal_links($page, $pageids);
 
             // Note created/modified time (if earlier / later than already recorded).
             $this->lessoninfo->update_times($page->timecreated, $page->timemodified, $USER->id);
+
+            $page->contents = $contents;
         }
 
         return $pages;
     }
 
-    protected function format_answer($page) {
-        $pagetype = $page->get_typestring();
+    /**
+     * Retrieve and format question pages to include answers.
+     *
+     * @param A Lesson page.
+     * @return Formatted page contents.
+     */
+    protected function format_answers($page)
+    {
+        $pagetype = $page->get_typeid();
         $contents = $page->contents;
         $answers = $page->answers;
         $qtype = $page->qtype;
 
-        $contents .= "<div class='pdf_answer_".$pagetype."_wrapper'>";
+        if ($pagetype == 20) {
+            return $contents;
+        }
+
+        $pagetypes = array(
+            1 => "shortanswer",
+            2 => "truefalse",
+            3 => "multichoice",
+            5 => "matching",
+            8 => "numerical",
+            10 => "essay",
+            20 => "lessonpage"
+        );
+
+        $pagetype = $pagetypes[$pagetype];
+
+        $contents .= "<div class='export_answer_".$pagetype."_wrapper'>";
 
         foreach ($answers as $answer) {
-            $contents .= "<div class='pdf_answer_$pagetype'>$answer->answer</div>";
+            $contents .= "<div class='export_answer_$pagetype'>$answer->answer</div>";
         }
 
         $contents .= "</div>";
@@ -328,7 +367,8 @@ class local_lessonexport {
      * @param padeids An array of page identifiers, from the loaded pages.
      * @see local_lessonexport::load_pages() for the array of pageids.
      */
-    protected function fix_internal_links($page, $pageids) {
+    protected function fix_internal_links($page, $pageids)
+    {
         if ($this->exporttype == self::EXPORT_PDF) {
             if (preg_match_all('|<a href="#([^"]+)"|', $page->contents, $matches)) {
                 $anchors = $matches[1];
@@ -381,7 +421,8 @@ class local_lessonexport {
      *
      * @return object An instance of lessonexport_pdf or lessonexport_epub.
      */
-    protected function start_export($download) {
+    protected function start_export($download)
+    {
         global $CFG;
         $exp = null;
         if ($this->exporttype == self::EXPORT_EPUB) {
@@ -415,12 +456,12 @@ class local_lessonexport {
      * @param exp The export object of type lessonexport_epub or lessonexport_pdf.
      * @param page The page to add to the export object.
      */
-    protected function export_page($exp, $page) {
+    protected function export_page($exp, $page)
+    {
         if ($this->exporttype == self::EXPORT_EPUB) {
             $content = '<h1>'.$page->title.'</h1>'.$page->contents;
             $href = 'pageid-'.$page->id.'.html';
             $exp->add_html($content, $page->title, array('tidy' => false, 'href' => $href, 'toc' => true));
-
         } else { // PDF.
             /** @var lessonexport_pdf $exp */
             $exp->addPage();
@@ -437,7 +478,8 @@ class local_lessonexport {
      *
      * @return string The file name or path to the document.
      */
-    protected function end_export($exp, $download) {
+    protected function end_export($exp, $download)
+    {
         global $CFG;
 
         $filename = $this->get_filename($download);
@@ -474,7 +516,8 @@ class local_lessonexport {
      *
      * @param download A boolean of whether the file will be immediately downloaded.
      */
-    protected function get_filename($download) {
+    protected function get_filename($download)
+    {
         $info = (object)array(
             'timestamp' => userdate(time(), '%Y-%m-%d %H:%M'),
             'lessonname' => format_string($this->lesson->name),
@@ -503,7 +546,8 @@ class local_lessonexport {
      *
      * @param exp The export object to add the cover-sheet to.
      */
-    protected function add_coversheet($exp) {
+    protected function add_coversheet($exp)
+    {
         if ($this->exporttype == self::EXPORT_EPUB) {
             $this->add_coversheet_epub($exp);
         } else {
@@ -517,7 +561,8 @@ class local_lessonexport {
      *
      * @param exp The lessonexport_epub object to add the cover-sheet to.
      */
-    protected function add_coversheet_epub(LessonLuciEPUB $exp) {
+    protected function add_coversheet_epub(LessonLuciEPUB $exp)
+    {
         global $CFG;
 
         $title = $this->lesson->name;
@@ -555,7 +600,8 @@ class local_lessonexport {
      *
      * @param exp The lessonexport_pdf object to add the cover-sheet to.
      */
-    protected function add_coversheet_pdf(pdf $exp) {
+    protected function add_coversheet_pdf(pdf $exp)
+    {
         global $CFG;
 
         $config = get_config('local_lessonexport');
@@ -603,7 +649,8 @@ class local_lessonexport {
      *
      * @return string A HTML string of the imploded export data.
      */
-    protected function get_coversheet_info() {
+    protected function get_coversheet_info()
+    {
         $info = array();
         if ($this->lessoninfo->has_timemodified()) {
             $strinfo = (object)array(
@@ -631,11 +678,13 @@ class local_lessonexport {
  *
  * @param $unused
  */
-function local_lessonexport_extends_navigation($unused) {
+function local_lessonexport_extends_navigation($unused)
+{
     local_lessonexport_extend_navigation($unused);
 }
 
-function local_lessonexport_extend_navigation($unused) {
+function local_lessonexport_extend_navigation($unused)
+{
     global $PAGE, $DB, $USER;
 
     $settingsnav = $PAGE->settingsnav;
@@ -670,25 +719,29 @@ function local_lessonexport_extend_navigation($unused) {
     $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));
 }
 
-function local_lessonexport_cron() {
+function local_lessonexport_cron()
+{
     local_lessonexport::cron();
 }
 
 /**
  * Class local_lessonexport_info
  */
-class local_lessonexport_info {
+class local_lessonexport_info
+{
     protected $timecreated = 0;
     protected $timemodified = 0;
     protected $modifiedbyid = null;
     protected $modifiedby = null;
     protected $timeprinted = 0;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->timeprinted = time();
     }
 
-    public function update_times($timecreated, $timemodified, $modifiedbyid) {
+    public function update_times($timecreated, $timemodified, $modifiedbyid)
+    {
         if (!$this->timecreated || $this->timecreated > $timecreated) {
             $this->timecreated = $timecreated;
         }
@@ -701,31 +754,38 @@ class local_lessonexport_info {
         }
     }
 
-    public function has_timecreated() {
+    public function has_timecreated()
+    {
         return (bool)$this->timecreated;
     }
 
-    public function has_timemodified() {
+    public function has_timemodified()
+    {
         return (bool)$this->timemodified;
     }
 
-    public function has_timeprinted() {
+    public function has_timeprinted()
+    {
         return (bool)$this->timeprinted;
     }
 
-    public function format_timecreated() {
+    public function format_timecreated()
+    {
         return userdate($this->timecreated);
     }
 
-    public function format_timemodified() {
+    public function format_timemodified()
+    {
         return userdate($this->timemodified);
     }
 
-    public function format_timeprinted() {
+    public function format_timeprinted()
+    {
         return userdate($this->timeprinted);
     }
 
-    public function get_modifiedby() {
+    public function get_modifiedby()
+    {
         global $USER, $DB;
 
         if ($this->modifiedby === null) {
@@ -748,7 +808,8 @@ class local_lessonexport_info {
  * @param context $restricttocontext (optional) if set, only files from this lesson will be included
  * @return null|stored_file
  */
-function local_lessonexport_get_image_file($fileurl, $restricttocontext = null) {
+function local_lessonexport_get_image_file($fileurl, $restricttocontext = null)
+{
     global $CFG;
     if (strpos($fileurl, $CFG->wwwroot.'/pluginfile.php') === false) {
         return null;
@@ -808,27 +869,26 @@ function local_lessonexport_get_image_file($fileurl, $restricttocontext = null) 
 /**
  * Class lessonexport_pdf
  */
-class lessonexport_pdf extends pdf {
+class lessonexport_pdf extends pdf
+{
     protected $directimageload = false;
     protected $restricttocontext = false;
 
     private $cm;
     private $lesson;
 
-    // public function __construct() {
-        // $this->lesson = $lesson;
-        // $this->cm = $cm;
-    // }
-
-    public function setCourseModule($cm) {
+    public function setCourseModule($cm)
+    {
         $this->cm = $cm;
     }
 
-    public function setLesson($lesson) {
+    public function setLesson($lesson)
+    {
         $this->lesson = $lesson;
     }
 
-    public function use_direct_image_load($restricttocontext = false) {
+    public function use_direct_image_load($restricttocontext = false)
+    {
         $this->directimageload = true;
         $this->restricttocontext = $restricttocontext;
 
@@ -867,9 +927,27 @@ class lessonexport_pdf extends pdf {
      * @param bool $alt
      * @param array $altimgs
      */
-    public function image($file, $x = '', $y = '', $w = 0, $h = 0, $type = '', $link = '', $align = '', $resize = false,
-                          $dpi = 300, $palign = '', $ismask = false, $imgmask = false, $border = 0, $fitbox = false,
-                          $hidden = false, $fitonpage = false, $alt = false, $altimgs = array()) {
+    public function image(
+        $file,
+        $x = '',
+        $y = '',
+        $w = 0,
+        $h = 0,
+        $type = '',
+        $link = '',
+        $align = '',
+        $resize = false,
+        $dpi = 300,
+        $palign = '',
+        $ismask = false,
+        $imgmask = false,
+        $border = 0,
+        $fitbox = false,
+        $hidden = false,
+        $fitonpage = false,
+        $alt = false,
+        $altimgs = array()
+    ) {
 
         $config = get_config('local_lessonexport');
         $exportstrict = $config->exportstrict;
@@ -919,11 +997,13 @@ class lessonexport_pdf extends pdf {
         }
     }
 
-    public function Header() {
+    public function Header()
+    {
         // No header.
     }
 
-    public function Footer() {
+    public function Footer()
+    {
         global $CFG;
         global $DB;
 
@@ -1029,7 +1109,8 @@ class lessonexport_pdf extends pdf {
      * @param $fileurl
      * @return string either the originalPath fileurl param or the file content with '@' appended to the start.
      */
-    protected function get_image_data($fileurl) {
+    protected function get_image_data($fileurl)
+    {
         if ($file = local_lessonexport_get_image_file($fileurl, $this->restricttocontext)) {
             $fileurl = '@'.$file->get_content();
         }
@@ -1044,7 +1125,8 @@ class lessonexport_pdf extends pdf {
      * @param $cell
      * @return mixed
      */
-    protected function openhtmltaghandler($dom, $key, $cell) {
+    protected function openhtmltaghandler($dom, $key, $cell)
+    {
         $tag = $dom[$key];
         if (array_key_exists('name', $tag['attribute'])) {
             $this->setDestination($tag['attribute']['name']); // Store the destination for TOC links.
@@ -1057,7 +1139,8 @@ class lessonexport_pdf extends pdf {
      *
      * @param file The file to apply the protection to.
      */
-    public function protect($file) {
+    public function protect($file)
+    {
         global $CFG;
 
         $config = get_config('local_lessonexport');
@@ -1077,7 +1160,7 @@ class lessonexport_pdf extends pdf {
 
         if (strlen($permissions) > 0 && strrpos($permissions, ',') > 0) {
             $permissions = explode(',', $permissions);
-        } else if (strlen($permissions) > 0 && !(strrpos($permissions, ',') > 0)) {
+        } elseif (strlen($permissions) > 0 && !(strrpos($permissions, ',') > 0)) {
             $permissions = array($permissions);
         } else {
             $permissions = array();
@@ -1105,7 +1188,8 @@ class lessonexport_pdf extends pdf {
 /**
  * Class lessonexport_epub
  */
-class lessonexport_epub extends LessonLuciEPUB {
+class lessonexport_epub extends LessonLuciEPUB
+{
     /**
      * Add HTML to the epub document, ensuring <img> tags are handled correctly.
      *
@@ -1113,7 +1197,8 @@ class lessonexport_epub extends LessonLuciEPUB {
      * @param title The title of the page the HTML is for.
      * @param config An array of additional settings to use in the method: toc, href, tidy
      */
-    public function add_html($html, $title, $config) {
+    public function add_html($html, $title, $config)
+    {
         if ($config['tidy'] && class_exists('tidy')) {
             $tidy = new tidy();
             $tidy->parseString($html, array(), 'utf8');
@@ -1153,7 +1238,8 @@ class lessonexport_epub extends LessonLuciEPUB {
      *
      * @see LessonLuciEPUB::addadd_spine_item()
      */
-    public function add_spine_item($data, $href = null, $fallback = null, $properties = null) {
+    public function add_spine_item($data, $href = null, $fallback = null, $properties = null)
+    {
         $globalconf = get_config('local_lessonexport');
         $style = '';
 
@@ -1180,11 +1266,11 @@ class lessonexport_epub extends LessonLuciEPUB {
     }
 }
 
-class Util {
-    public static function hex_to_rgb($hex) {
+class Util
+{
+    public static function hex_to_rgb($hex)
+    {
         global $CFG;
-
-
 
         // If there is a hash symbol with the hex, remove it
         if (strpos($hex, '#') !== false) {
