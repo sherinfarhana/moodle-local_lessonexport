@@ -331,7 +331,9 @@ class local_lessonexport
         $answers = $page->answers;
         $qtype = $page->qtype;
 
-        if ($pagetype == 20) {
+        // Don't look for answers in lesson types and don't print
+        // short answer answer patterns.
+        if ($pagetype == 1 || $pagetype == 20) {
             return $contents;
         }
 
@@ -350,6 +352,11 @@ class local_lessonexport
         $contents .= "<div class='export_answer_".$pagetype."_wrapper'>";
 
         foreach ($answers as $answer) {
+            // If this is a matching question type, only print the answers, not responses.
+            if ($pagetype == 5 && $answer->answerformat == 1) {
+                continue;
+            }
+
             $contents .= "<div class='export_answer_$pagetype'>$answer->answer</div>";
         }
 
@@ -464,10 +471,30 @@ class local_lessonexport
             $exp->add_html($content, $page->title, array('tidy' => false, 'href' => $href, 'toc' => true));
         } else { // PDF.
             /** @var lessonexport_pdf $exp */
+            $contents = $page->contents;
+
             $exp->addPage();
             $exp->setDestination('pageid-'.$page->id);
+
+            $pagebreaks = array();
+            preg_match_all('/<[^>]+class\s*=\s*"\s*pagebreak\s*".*?>/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
+
             $exp->writeHTML('<h2>'.$page->title.'</h2>');
-            $exp->writeHTML($page->contents);
+
+            if (!empty($pagebreaks)) {
+                $segments = preg_split('/<[^>]+class\s*=\s*"\s*pagebreak\s*".*?>/', $contents);
+
+                // Loop over pagebreak tags and split content, add pages.
+                foreach ($segments as $index=>$segment) {
+                    $exp->writeHTML($segment);
+
+                    if ($index < sizeof($segments) - 1) {
+                        $exp->addPage();
+                    }
+                }
+            } else {
+                $exp->writeHTML($segment);
+            }
         }
     }
 
