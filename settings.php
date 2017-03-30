@@ -28,14 +28,6 @@ if ($hassiteconfig) {
     $ADMIN->add('modules', new admin_category('lessonexport', get_string('pluginname', 'local_lessonexport')));
     $page = new admin_settingpage('lessonexportpage', get_string('pluginname', 'local_lessonexport'));
 
-    $customStyleDefault = '
-        html, body {
-            font-family: "Helvetica", sans-serif;
-        }';
-    $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle',
-                                            get_string('customstyle', 'local_lessonexport'),
-                                            get_string('customstyle_desc', 'local_lessonexport'), $customStyleDefault, PARAM_RAW));
-
     $page->add(new admin_setting_configtext('local_lessonexport/customfont',
                                             get_string('customfont', 'local_lessonexport'),
                                             get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));

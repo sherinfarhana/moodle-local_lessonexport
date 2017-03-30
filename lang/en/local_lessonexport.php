@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 
 $string['created'] = 'Created on {$a}';
-$string['exportepub'] = 'Export as epub';
 $string['exportpdf'] = 'Export as PDF';
 $string['failedinsertimage'] = 'Failed to insert image: {$a}';
 $string['filename'] = 'Export {$a->lessonname} {$a->timestamp}';
@@ -35,15 +34,12 @@ $string['printed'] = 'This document was downloaded on {$a}';
 $string['publishemail'] = 'Auto-publish email';
 $string['publishemail_desc'] = 'The email address that PDFs will be sent to automatically whenever a lesson changes';
 $string['publishername'] = 'Unknown';
-$string['lessonexport:exportepub'] = 'Export lesson as epub';
 $string['lessonexport:exportpdf'] = 'Export lesson as PDF';
 $string['lessonexportfailed'] = 'Export of lesson \'{$a}\' failed';
 $string['lessonexportfailed_body'] = 'The lesson \'{$a->name}\' has been updated, but the attempt to export and email it has failed, after {$a->exportattempts} attempts. If the lesson is updated again, then further attempts will be made to export it. The Lesson can be found at: {$a->url}.';
 $string['lessonupdated'] = 'Lesson \'{$a}\' updated';
 $string['lessonupdated_body'] = 'Updated export attached';
 
-$string['customstyle'] = 'Custom EPUB style rules';
-$string['customstyle_desc'] = 'Custom CSS to apply only to the exported EPUB';
 $string['customfont'] = 'Default PDF font family';
 $string['customfont_desc'] = 'Default font to use in the printed PDF. Possible fonts include: times (Times-Roman), timesb (Times-Bold), timesi (Times-Italic), timesbi (Times-BoldItalic), helvetica (Helvetica), helveticab (Helvetica-Bold), helveticai, helveticabi, courier (Courier), courierb (Courier-Bold), courieri (Courier-Oblique), courierbi (Courier-BoldOblique), symbol (Symbol), zapfdingbats (ZapfDingbats)';
 $string['pdfuserpassword'] = 'PDF document user password';

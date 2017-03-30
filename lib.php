@@ -25,7 +25,6 @@
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
-require_once($CFG->dirroot.'/local/lessonexport/lib/luciepub/LuciEPUB.php');
 require_once($CFG->dirroot.'/mod/lesson/locallib.php');
 
 class local_lessonexport
@@ -39,12 +38,11 @@ class local_lessonexport
     /** @var string */
     protected $exporttype;
 
-    const EXPORT_EPUB = 'epub';
     const EXPORT_PDF = 'pdf';
 
     const MAX_EXPORT_ATTEMPTS = 2;
 
-    protected static $exporttypes = array(self::EXPORT_EPUB, self::EXPORT_PDF);
+    protected static $exporttypes = array(self::EXPORT_PDF);
 
     public function __construct($cm, $lesson, $exporttype)
     {
@@ -385,8 +383,7 @@ class local_lessonexport
             }
         }
 
-        // Replace links to other pages with anchor links to '#pageid-[page id]' (PDF)
-        // or links to page 'pageid-[page id].html' (EPUB).
+        // Replace links to other pages with anchor links to '#pageid-[page id]' (PDF).
         $baseurl = new moodle_url('/mod/lesson/view.php', array('pageid' => 'PAGEID'));
         $baseurl = $baseurl->out(false);
         $baseurl = preg_quote($baseurl);
@@ -397,11 +394,7 @@ class local_lessonexport
             foreach ($ids as $idx => $pageid) {
                 if (in_array($pageid, $pageids)) {
                     $find = $urls[$idx];
-                    if ($this->exporttype == self::EXPORT_PDF) {
-                        $replace = '#pageid-'.$pageid;
-                    } else { // Epub - link to correct page in export.
-                        $replace = 'pageid-'.$pageid.'.html';
-                    }
+                    $replace = '#pageid-'.$pageid;
                     $page->contents = str_replace($find, $replace, $page->contents);
                 }
             }
@@ -426,75 +419,58 @@ class local_lessonexport
      * The first step of exporting a document. This method creates an instance of the correct
      * export type and then sets the correct properties on it.
      *
-     * @return object An instance of lessonexport_pdf or lessonexport_epub.
+     * @return object An instance of lessonexport_pdf
      */
     protected function start_export($download)
     {
         global $CFG;
         $exp = null;
-        if ($this->exporttype == self::EXPORT_EPUB) {
-            $exp = new lessonexport_epub();
-            $exp->set_title($this->lesson->name);
-            $exp->set_uid();
-            $exp->set_date();
-            if ($CFG->lang) {
-                $exp->add_language($CFG->lang);
-            }
-            $exp->set_publisher(get_string('publishername', 'local_lessonexport'));
-        } else { // PDF.
-            $exp = new lessonexport_pdf();
-            $exp->setCourseModule($this->cm);
-            $exp->setLesson($this->lesson);
-            $restricttocontext = false;
-            if ($download) {
-                $restricttocontext = context_module::instance($this->cm->id);
-            }
-            $exp->use_direct_image_load($restricttocontext);
-            $exp->SetMargins(20, 10, -1, true); // Set up wider left margin than default.
+        $exp = new lessonexport_pdf();
+        $exp->setCourseModule($this->cm);
+        $exp->setLesson($this->lesson);
+        $restricttocontext = false;
+        if ($download) {
+            $restricttocontext = context_module::instance($this->cm->id);
         }
+        $exp->use_direct_image_load($restricttocontext);
+        $exp->SetMargins(20, 10, -1, true); // Set up wider left margin than default.
 
         return $exp;
     }
 
     /**
-     * Add a page of content to the exported document. The page is built with HTML directly for EPUB.
-     * For PDF a page is first added, the destination link is set and finally the HTML is written.
+     * Add a page of content to the exported document.
+     * A page is first added,the destination link is set and finally the HTML is written.
      *
-     * @param exp The export object of type lessonexport_epub or lessonexport_pdf.
+     * @param exp The export object of type lessonexport_pdf.
      * @param page The page to add to the export object.
      */
     protected function export_page($exp, $page)
     {
-        if ($this->exporttype == self::EXPORT_EPUB) {
-            $content = '<h1>'.$page->title.'</h1>'.$page->contents;
-            $href = 'pageid-'.$page->id.'.html';
-            $exp->add_html($content, $page->title, array('tidy' => false, 'href' => $href, 'toc' => true));
-        } else { // PDF.
-            /** @var lessonexport_pdf $exp */
-            $contents = $page->contents;
+        /** @var lessonexport_pdf $exp */
+        $contents = $page->contents;
 
-            $exp->addPage();
-            $exp->setDestination('pageid-'.$page->id);
+        $exp->addPage();
+        $exp->setDestination('pageid-'.$page->id);
 
-            $pagebreaks = array();
-            preg_match_all('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
+        $pagebreaks = array();
+        preg_match_all('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
 
-            $exp->writeHTML('<h2>'.$page->title.'</h2>');
+        $exp->writeHTML('<h2>'.$page->title.'</h2>');
 
-            if (!empty($pagebreaks)) {
-                $segments = preg_split('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents);
+        if (!empty($pagebreaks)) {
+            $segments = preg_split('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents);
 
-                // Loop over pagebreak tags and split content, add pages.
-                foreach ($segments as $index=>$segment) {
-                    $exp->writeHTML($segment);
-
-                    if ($index < sizeof($segments) - 1) {
-                        $exp->addPage();
-                    }
-                }
-            } else {
+            // Loop over pagebreak tags and split content, add pages.
+            foreach ($segments as $index=>$segment) {
                 $exp->writeHTML($segment);
+
+                if ($index < sizeof($segments) - 1) {
+                    $exp->addPage();
+                }
             }
+        } else {
+            $exp->writeHTML($segment);
         }
     }
 
@@ -511,24 +487,13 @@ class local_lessonexport
 
         $filename = $this->get_filename($download);
 
-        if ($this->exporttype == self::EXPORT_EPUB) {
-            /** @var LuciEPUB $exp */
-            $exp->generate_nav();
-            $out = $exp->generate();
-            if ($download) {
-                $out->sendZip($filename, 'application/epub+zip');
-            } else {
-                $out->setZipFile($filename);
-            }
-        } else { // PDF
-            // Add the configured protection to the PDF
-            $exp->protect($this->get_filename($download));
+        // Add the configured protection to the PDF
+        $exp->protect($this->get_filename($download));
 
-            if ($download) {
-                $exp->Output($filename, 'D');
-            } else {
-                $exp->Output($filename, 'F');
-            }
+        if ($download) {
+            $exp->Output($filename, 'D');
+        } else {
+            $exp->Output($filename, 'F');
         }
 
         // Remove 'dataroot' from the filename, so the email sending can put it back again.
@@ -550,12 +515,7 @@ class local_lessonexport
             'lessonname' => format_string($this->lesson->name),
         );
         $filename = get_string('filename', 'local_lessonexport', $info);
-        if ($this->exporttype == self::EXPORT_EPUB) {
-            $filename .= '.epub';
-        } else { // PDF.
-            $filename .= '.pdf';
-        }
-
+        $filename .= '.pdf';
         $filename = clean_filename($filename);
 
         if (!$download) {
@@ -575,50 +535,7 @@ class local_lessonexport
      */
     protected function add_coversheet($exp)
     {
-        if ($this->exporttype == self::EXPORT_EPUB) {
-            $this->add_coversheet_epub($exp);
-        } else {
-            $this->add_coversheet_pdf($exp);
-        }
-    }
-
-    /**
-     * Add a cover sheet before all of the page contents containing the Lesson title,
-     * the description, and other configurable data.
-     *
-     * @param exp The lessonexport_epub object to add the cover-sheet to.
-     */
-    protected function add_coversheet_epub(LessonLuciEPUB $exp)
-    {
-        global $CFG;
-
-        $title = $this->lesson->name;
-        $description = format_text($this->lesson->intro, $this->lesson->introformat);
-        $info = $this->get_coversheet_info();
-
-        $img = 'images/logo.png';
-        $imgsrc = $CFG->dirroot.'/local/lessonexport/pix/logo.png';
-        $fp = fopen($imgsrc, 'r');
-        $exp->add_item_file($fp, mimeinfo('type', $imgsrc), $img);
-
-        $html = '';
-
-        $imgel = html_writer::empty_tag('img', array('src' => $img, 'style' => 'max-width: 90%;'));
-        $html .= html_writer::div($imgel, 'fronttitle', array('style' => 'text-align: center; padding: 1em 0;'));
-        $html .= html_writer::div(' ', 'fronttitletop', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: rgb(18, 160, 83); margin-top: 1em;'));
-        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: rgb(18, 160, 83);
-                                                                  min-height: 2em; text-align: center; padding-top: 0.8em;
-                                                                  size: 1em; margin: 0; color: #fff;' ));
-        $html .= html_writer::div(' ', 'fronttitlebottom', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: rgb(18, 160, 83); margin-bottom: 1em;'));
-        $html .= html_writer::div($description, 'frontdescription', array('style' => 'margin: 0.5em 1em;'));
-        $html .= html_writer::div($info, 'frontinfo', array('style' => 'margin: 2em 1em'));
-
-        // $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
-        //                                                                width: 90%;'));
-
-        $exp->add_spine_item($html, 'cover.html');
+        $this->add_coversheet_pdf($exp);
     }
 
     /**
@@ -701,7 +618,7 @@ class local_lessonexport
 }
 
 /**
- * Insert the 'Export as epub' and 'Export as PDF' links into the navigation.
+ * Insert the 'Export as PDF' link into the navigation.
  *
  * @param $unused
  */
@@ -738,7 +655,7 @@ function local_lessonexport_extend_navigation($unused)
         $modulesettings->add($name, $url, navigation_node::TYPE_SETTING);
     }
 
-    // Use javascript to insert the pdf/epub links.
+    // Use javascript to insert the pdf link.
     $jslinks = array();
     foreach ($links as $name => $url) {
         $link = html_writer::link($url, $name);
@@ -1211,87 +1128,6 @@ class lessonexport_pdf extends pdf
         $this->Output($file, 'D');
 
         return $file;
-    }
-}
-
-/**
- * Class lessonexport_epub
- */
-class lessonexport_epub extends LessonLuciEPUB
-{
-    /**
-     * Add HTML to the epub document, ensuring <img> tags are handled correctly.
-     *
-     * @param html The HTML string to apply to the document.
-     * @param title The title of the page the HTML is for.
-     * @param config An array of additional settings to use in the method: toc, href, tidy
-     */
-    public function add_html($html, $title, $config)
-    {
-        if ($config['tidy'] && class_exists('tidy')) {
-            $tidy = new tidy();
-            $tidy->parseString($html, array(), 'utf8');
-            $tidy->cleanRepair();
-            $html = $tidy->html()->value;
-        }
-
-        // Handle <img> tags.
-        if (preg_match_all('~(<img [^>]*?)src=([\'"])(.+?)[\'"]~', $html, $matches)) {
-            foreach ($matches[3] as $imageurl) {
-                if ($file = local_lessonexport_get_image_file($imageurl)) {
-                    $newpath = implode('/', array('images', $file->get_contextid(), $file->get_component(), $file->get_filearea(),
-                                                  $file->get_itemid(), $file->get_filepath(), $file->get_filename()));
-                    $newpath = str_replace(array('///', '//'), '/', $newpath);
-                    $this->add_item_file($file->get_content_file_handle(), $file->get_mimetype(), $newpath);
-                    $html = str_replace($imageurl, $newpath, $html);
-                }
-            }
-        }
-
-        // Set the href value, if specified.
-        $href = null;
-        if (!empty($config['href'])) {
-            $href = $config['href'];
-        }
-        $this->add_spine_item($html, $href);
-        if ($config['toc']) {
-            $this->set_item_toc($title, true);
-        }
-
-        return $title;
-    }
-
-    /**
-     * Create the content skeleton if it does not exist and then pass it up to the parent method
-     * of the same signature.
-     *
-     * @see LessonLuciEPUB::addadd_spine_item()
-     */
-    public function add_spine_item($data, $href = null, $fallback = null, $properties = null)
-    {
-        $globalconf = get_config('local_lessonexport');
-        $style = '';
-
-        if (!empty($globalconf)) {
-            $style = $globalconf->customstyle;
-        }
-
-        if (strpos('<html', $data) === false) {
-            $data = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-                    <!DOCTYPE html>
-                    <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" xml:lang="en" lang="en">
-                        <head>
-                        </head>
-                        <body>
-                        <style>
-                        '.$style.'
-                        </style>
-                        '.$data.'
-                        </body>
-                    </html>';
-        }
-
-        return parent::add_spine_item($data, $href, $fallback, $properties);
     }
 }
 
