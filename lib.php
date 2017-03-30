@@ -477,12 +477,12 @@ class local_lessonexport
             $exp->setDestination('pageid-'.$page->id);
 
             $pagebreaks = array();
-            preg_match_all('/<[^>]+class\s*=\s*"\s*pagebreak\s*".*?>/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
+            preg_match_all('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
 
             $exp->writeHTML('<h2>'.$page->title.'</h2>');
 
             if (!empty($pagebreaks)) {
-                $segments = preg_split('/<[^>]+class\s*=\s*"\s*pagebreak\s*".*?>/', $contents);
+                $segments = preg_split('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents);
 
                 // Loop over pagebreak tags and split content, add pages.
                 foreach ($segments as $index=>$segment) {

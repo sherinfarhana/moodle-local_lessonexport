@@ -10,6 +10,8 @@ Usage
 Once the plugin is installed, you can visit a lesson, then click on the new 'Export as epub' or 'Export as PDF' links that appear
 in the activity administration block (with javascript enabled, similar links are inserted on the top-right corner of the page).
 
+You may also add page-breaks in the content by giving any element (in HTML) the 'pagebreak' class. This will remove the element from the content that is used as a break so be careful here. Regular expressions are used to find the pagebreak elements and as such, it's more preferable to place these on self-closing tags. If not used on self-closing tags, such as `<br class="pagebreak" />`, then be careful not to place content inside of those elements as the trailing close tag will not be matched.
+
 When editing footer content in the Lesson Export settings, there are several shortcodes you may use to add useful information to the
 document.
 
