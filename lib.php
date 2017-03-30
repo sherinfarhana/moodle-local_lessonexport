@@ -714,11 +714,13 @@ function local_lessonexport_extend_navigation($unused)
 {
     global $PAGE, $DB, $USER;
 
-    $settingsnav = $PAGE->settingsnav;
-
-    if (!$PAGE->cm || $PAGE->cm->modname != 'lesson' || empty($settingsnav)) {
+    $settingsnav = null;
+    if (!$PAGE->cm || $PAGE->cm->modname != 'lesson') {
         return;
+    } else {
+        $settingsnav = $PAGE->settingsnav;
     }
+
     $groupid = groups_get_activity_group($PAGE->cm);
     $lesson = $DB->get_record('lesson', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
 
