@@ -35,7 +35,7 @@ $url = new moodle_url('/local/lessonexport/export.php', array('id' => $cm->id));
 $PAGE->set_url($url);
 require_login($course, false, $cm);
 
-$export = new local_lessonexport($cm, $lesson, $exporttype);
+$export = new local_lessonexport($cm, $lesson);
 $export->check_access();
 
 $export->export();

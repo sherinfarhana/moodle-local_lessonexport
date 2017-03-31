@@ -35,8 +35,6 @@ class local_lessonexport
     protected $lesson;
     /** @var local_lessonexport_info */
     protected $lessoninfo;
-    /** @var string */
-    protected $exporttype;
 
     const EXPORT_PDF = 'pdf';
 
@@ -44,10 +42,11 @@ class local_lessonexport
 
     protected static $exporttypes = array(self::EXPORT_PDF);
 
-    public function __construct($cm, $lesson, $exporttype)
+    public function __construct($cm, $lesson)
     {
         $this->cm = $cm;
         $this->lesson = $lesson;
+        $exporttype = reset(self::$exporttypes);
         $this->lessoninfo = new local_lessonexport_info();
 
         if (in_array($exporttype, self::$exporttypes)) {
