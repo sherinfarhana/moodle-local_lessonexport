@@ -1,6 +1,6 @@
 /*global M*/
 M.local_lessonexport = M.local_lessonexport || {};
-M.local_lessonexport.printlinks = {    
+M.local_lessonexport.printlinks = {
     init: function(links) {
         var el, parent, i;
 
@@ -14,7 +14,8 @@ M.local_lessonexport.printlinks = {
             el = el.next();
             parent = el.ancestor();
         } catch (e) {
-            return; // The correct location to add the links was not found.
+            // The correct location to add the links was not found.
+            return;
         }
 
         for (i in links) {

@@ -658,7 +658,7 @@ function local_lessonexport_extend_navigation($unused)
     $jslinks = array();
     foreach ($links as $name => $url) {
         $link = html_writer::link($url, $name);
-        $link = html_writer::div($link, 'lesson_right');
+        $link = html_writer::div($link, 'exportpdf');
         $jslinks[] = $link;
     }
     $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));

@@ -38,11 +38,13 @@ There are many globally configurable options for exporting PDF documents from a 
 Customising
 ===========
 
+If you want to customise the button that exports documents, please use the class `exportpdf` for custom css. The outer `div` element with
+the class `exportpdf` is the container for an `a` element, which is the export link.
+
 If you want to add your organisation's logo to the front page of the exported lesson, please replace the file
 local/lessonexport/pix/logo.png with your logo. Do not alter the file dimensions, it must remain 514 by 182 pixels.
 
 Customise the following language strings, to alter the embedded export information:
-'publishername' - set the PDF 'publisher' field
 'printed' - set the description on the front page 'This doucment was downloaded on [date]'
 
 (see https://docs.moodle.org/en/Language_customization for more details)
