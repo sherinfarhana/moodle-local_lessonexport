@@ -104,13 +104,12 @@ class local_lessonexport
         // Raise the max execution time to 5 min, not 30 seconds.
         @set_time_limit(300);
 
-        $pages = $this->load_pages();           // PAGES ARE FINE
-                                                // PAGES ARE GARBLED
+        $pages = $this->load_pages();
 
-        $exp = $this->start_export($download);  // DOESN'T GARBLE CONTENT
-        $this->add_coversheet($exp);            // DOESN'T GARBLE CONTENT
-        foreach ($pages as $page) {             //
-            $this->export_page($exp, $page);    // PAGES ARE GARBLED
+        $exp = $this->start_export($download);
+        $this->add_coversheet($exp);
+        foreach ($pages as $page) {
+            $this->export_page($exp, $page);
         }
         return $this->end_export($exp, $download);
     }
@@ -448,14 +447,13 @@ class local_lessonexport
     {
         /** @var lessonexport_pdf $exp */
         $contents = $page->contents;
+        $contents = '<h2>'.$page->title.'</h2>'.$contents;
 
         $exp->addPage();
         $exp->setDestination('pageid-'.$page->id);
 
         $pagebreaks = array();
         preg_match_all('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents, $pagebreaks, PREG_OFFSET_CAPTURE);
-
-        $exp->writeHTML('<h2>'.$page->title.'</h2>');
 
         if (!empty($pagebreaks)) {
             $segments = preg_split('/<[^>]+class\s*?=\s*?"\s*?pagebreak\s*?"\/?>(<\/[A-Za-z]+>)?/', $contents);
