@@ -17,8 +17,7 @@
 /**
  * Event handlers
  *
- * @package   local_lessonexport
- * @copyright 2014 Davo Smith, Synergy Learning
+ * @package   local_lessonexportepub
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,10 +26,10 @@ defined('MOODLE_INTERNAL') || die();
 $observers = [
     [
         'eventname' => '\core\event\course_deleted',
-        'callback' => '\local_lessonexport\observer::course_deleted',
+        'callback' => '\local_lessonexportepub\observer::course_deleted',
     ],
     [
         'eventname' => '\core\event\course_module_deleted',
-        'callback' => '\local_lessonexport\observer::course_module_deleted',
+        'callback' => '\local_lessonexportepub\observer::course_module_deleted',
     ],
 ];

@@ -17,7 +17,7 @@
 /**
  * Global settings
  *
- * @package   local_lessonexport
+ * @package   local_lessonexportepub
  * @copyright 2017 Adam King, SHEilds eLearning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -25,87 +25,26 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('lessonexport', get_string('pluginname', 'local_lessonexport')));
-    $page = new admin_settingpage('lessonexportpage', get_string('pluginname', 'local_lessonexport'));
+    if ($ADMIN->locate('lessonexport') == null) {
+        $ADMIN->add('modules', new admin_category('lessonexport', get_string('plugingroup', 'local_lessonexportepub')));
+    }
+    $page = new admin_settingpage('lessonexportepubpage', get_string('pluginname', 'local_lessonexportepub'));
 
     $customStyleDefault = '
         html, body {
             font-family: "Helvetica", sans-serif;
         }';
-    $page->add(new admin_setting_configtextarea('local_lessonexport/customstyle',
-                                            get_string('customstyle', 'local_lessonexport'),
-                                            get_string('customstyle_desc', 'local_lessonexport'), $customStyleDefault, PARAM_RAW));
+    $page->add(new admin_setting_configtextarea('local_lessonexportepub/customstyle',
+                                            get_string('customstyle', 'local_lessonexportepub'),
+                                            get_string('customstyle_desc', 'local_lessonexportepub'), $customStyleDefault, PARAM_RAW));
 
-    $page->add(new admin_setting_configtext('local_lessonexport/customfont',
-                                            get_string('customfont', 'local_lessonexport'),
-                                            get_string('customfont_desc', 'local_lessonexport'), 'helvetica', PARAM_RAW));
+    $page->add(new admin_setting_configcheckbox('local_lessonexportepub/exportstrict',
+                                            get_string('exportstrict', 'local_lessonexportepub'),
+                                            get_string('exportstrict_desc', 'local_lessonexportepub'), 0));
 
-    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfUserPassword',
-                                            get_string('pdfuserpassword', 'local_lessonexport'),
-                                            get_string('pdfuserpassword_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_configpasswordunmask('local_lessonexport/pdfOwnerPassword',
-                                            get_string('pdfownerpassword', 'local_lessonexport'),
-                                            get_string('pdfownerpassword_desc', 'local_lessonexport'), ''));
-
-    // Footer text areas.
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopLeft',
-                                            get_string('pdffootertopleft', 'local_lessonexport'),
-                                            get_string('pdffootertopleft_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopMiddle',
-                                            get_string('pdffootertopmiddle', 'local_lessonexport'),
-                                            get_string('pdffootertopmiddle_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterTopRight',
-                                            get_string('pdffootertopright', 'local_lessonexport'),
-                                            get_string('pdffootertopright_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomLeft',
-                                            get_string('pdffooterbottomleft', 'local_lessonexport'),
-                                            get_string('pdffooterbottomleft_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomMiddle',
-                                            get_string('pdffooterbottommiddle', 'local_lessonexport'),
-                                            get_string('pdffooterbottommiddle_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_confightmleditor('local_lessonexport/pdfFooterBottomRight',
-                                            get_string('pdffooterbottomright', 'local_lessonexport'),
-                                            get_string('pdffooterbottomright_desc', 'local_lessonexport'), ''));
-
-    $page->add(new admin_setting_configcheckbox('local_lessonexport/pdfFrontCoverPageNumbers',
-                                            get_string('pdffrontcoverpagenumbers', 'local_lessonexport'),
-                                            get_string('pdffrontcoverpagenumbers_desc', 'local_lessonexport'), 1));
-
-    // PDF permission settings.
-    $choices = array(
-        get_string('printpermission', 'local_lessonexport') => get_string('printpermission_desc', 'local_lessonexport'),
-        get_string('modifypermission', 'local_lessonexport') => get_string('modifypermission_desc', 'local_lessonexport'),
-        get_string('copypermission', 'local_lessonexport') => get_string('copypermission_desc', 'local_lessonexport'),
-        get_string('annotatepermission', 'local_lessonexport') => get_string('annotatepermission_desc', 'local_lessonexport'),
-        get_string('formfillpermission', 'local_lessonexport') => get_string('formfillpermission_desc', 'local_lessonexport'),
-        get_string('extractpermission', 'local_lessonexport') => get_string('extractpermission_desc', 'local_lessonexport'),
-        get_string('assemblepermission', 'local_lessonexport') => get_string('assemblepermission_desc', 'local_lessonexport'),
-        get_string('highdefpermission', 'local_lessonexport') => get_string('highdefpermission_desc', 'local_lessonexport')
-    );
-    $defaults = array(
-        // get_string('printpermission', 'local_lessonexport')     => 'enabled',   // print
-        // get_string('modifypermission', 'local_lessonexport')    => 'enabled',   // modify
-        // get_string('copypermission', 'local_lessonexport')      => 'enabled',   // copy
-        // get_string('annotatepermission', 'local_lessonexport')  => 'enabled',   // annotate
-        // get_string('formfillpermission', 'local_lessonexport')  => 'enabled',   // forms
-        // get_string('extractpermission', 'local_lessonexport')   => 'enabled',   // extract
-        // get_string('assemblepermission', 'local_lessonexport')  => 'enabled',   // assemble
-        // get_string('highdefpermission', 'local_lessonexport')   => 'enabled'    // high-def
-    );
-    $page->add(new admin_setting_configmulticheckbox('local_lessonexport/pdfProtection', get_string('pdfprotection','local_lessonexport'),
-                                            get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));
-
-    $page->add(new admin_setting_configcheckbox('local_lessonexport/exportstrict', get_string('exportstrict', 'local_lessonexport'),
-    get_string('exportstrict_desc', 'local_lessonexport'), 0));
-
-    $page->add(new admin_setting_configcolourpicker('local_lessonexport/coverColour', get_string('covercolour', 'local_lessonexport'),
-                                            get_string('covercolour_desc', 'local_lessonexport'), '#12A053'));
+    $page->add(new admin_setting_configcolourpicker('local_lessonexportepub/coverColour',
+                                            get_string('covercolour', 'local_lessonexportepub'),
+                                            get_string('covercolour_desc', 'local_lessonexportepub'), '#12A053'));
 
     $ADMIN->add('lessonexport', $page);
 }

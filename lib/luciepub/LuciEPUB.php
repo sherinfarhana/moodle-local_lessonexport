@@ -796,7 +796,7 @@ class LessonLuciEPUB {
 		else
 			$text .= "<body>\n";
 
-		$config = get_config('local_lessonexport');
+		$config = get_config('local_lessonexportepub');
 		if (!empty($config->customstyle))
 			$text .= "<style>" . $config->customstyle . "</style>\n";
 

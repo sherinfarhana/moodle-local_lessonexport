@@ -1,7 +1,7 @@
 {
-    "name": "moodle-local_lessonexport-printlinks",
+    "name": "moodle-local_lessonexportepub-printlinks",
     "builds": {
-        "moodle-local_lessonexport-printlinks": {
+        "moodle-local_lessonexportepub-printlinks": {
             "jsfiles": [
                 "printlinks.js"
             ]

@@ -17,12 +17,12 @@
 /**
  * Handle any relevant events.
  *
- * @package   local_lessonexport
+ * @package   local_lessonexportepub
  * @copyright 2016 Davo Smith, Synergy Learning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_lessonexport;
+namespace local_lessonexportepub;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -31,7 +31,6 @@ class observer {
      * Clean up any local_lessonexport_order records associated with the deleted course.
      * @param \core\event\course_deleted $event
      */
-
     public static function course_deleted(\core\event\course_deleted $event) {
         global $DB;
         $DB->delete_records('local_lessonexport_order', ['courseid' => $event->courseid]);

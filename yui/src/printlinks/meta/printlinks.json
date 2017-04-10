@@ -1,5 +1,5 @@
 {
-    "moodle-local_lessonexport-printlinks": {
+    "moodle-local_lessonexportepub-printlinks": {
         "requires": [
             "base",
             "node"

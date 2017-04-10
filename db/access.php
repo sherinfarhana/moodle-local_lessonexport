@@ -17,15 +17,14 @@
 /**
  * Capability definitions
  *
- * @package   local_lessonexport
- * @copyright 2014 Davo Smith, Synergy Learning
+ * @package   local_lessonexportepub
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
-    'local/lessonexport:exportepub' => array(
+    'local/lessonexportepub:export' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -33,15 +32,5 @@ $capabilities = array(
             'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
         ),
-    ),
-
-    'local/lessonexport:exportpdf' => array(
-        'captype' => 'read',
-        'contextlevel' => CONTEXT_MODULE,
-        'archetypes' => array(
-            'student' => CAP_ALLOW,
-            'teacher' => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-        ),
-    ),
+    )
 );

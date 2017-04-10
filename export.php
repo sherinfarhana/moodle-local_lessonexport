@@ -17,30 +17,24 @@
 /**
  * Main entry point for export
  *
- * @package   local_lessonexport
+ * @package   local_lessonexportepub
  * @copyright 2017 Adam King, SHEilds eLearning
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 require_once(dirname(__FILE__).'/../../config.php');
 global $CFG, $DB, $USER, $PAGE;
-require_once($CFG->dirroot.'/local/lessonexport/lib.php');
+require_once($CFG->dirroot.'/local/lessonexportepub/lib.php');
 
 $cmid = required_param('id', PARAM_INT);
-$exporttype = required_param('type', PARAM_ALPHA);
 $cm = get_coursemodule_from_id('lesson', $cmid, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 $lesson = $DB->get_record('lesson', array('id' => $cm->instance), '*', MUST_EXIST);
-$url = new moodle_url('/local/lessonexport/export.php', array('id' => $cm->id, 'type' => $exporttype));
+$url = new moodle_url('/local/lessonexportepub/export.php', array('id' => $cm->id));
 
 $PAGE->set_url($url);
 require_login($course, false, $cm);
 
-$export = new local_lessonexport($cm, $lesson, $exporttype);
+$export = new local_lessonexportepub($cm, $lesson);
 $export->check_access();
-
-if ($exporttype == "pdf") {
-    $export->export(true);
-} else {
-    $export->export();
-}
+$export->export(true);
