@@ -22,6 +22,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_lessonexportepub;
+
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/local/lessonexportepub/lib/luciepub/LuciEPUB.php');
@@ -33,7 +35,7 @@ class local_lessonexportepub
     protected $cm;
     /** @var object */
     protected $lesson;
-    /** @var local_lessonexport_info */
+    /** @var local_lessonexportepub_info */
     protected $lessoninfo;
 
     const MAX_EXPORT_ATTEMPTS = 2;
@@ -42,7 +44,7 @@ class local_lessonexportepub
     {
         $this->cm = $cm;
         $this->lesson = $lesson;
-        $this->lessoninfo = new local_lessonexport_info();
+        $this->lessoninfo = new local_lessonexportepub_info();
     }
 
     /**
@@ -546,15 +548,15 @@ function local_lessonexportepub_extend_navigation($unused)
     $PAGE->requires->yui_module('moodle-local_lessonexportepub-printlinks', 'M.local_lessonexportepub.printlinks.init', array($jslinks));
 }
 
-function local_lessonexport_cron()
+function local_lessonexportepub_cron()
 {
     local_lessonexportepub::cron();
 }
 
 /**
- * Class local_lessonexport_info
+ * Class local_lessonexportepub_info
  */
-class local_lessonexport_info
+class local_lessonexportepub_info
 {
     protected $timecreated = 0;
     protected $timemodified = 0;
@@ -635,7 +637,7 @@ class local_lessonexport_info
  * @param context $restricttocontext (optional) if set, only files from this lesson will be included
  * @return null|stored_file
  */
-function local_lessonexport_get_image_file($fileurl, $restricttocontext = null)
+function local_lessonexportepub_get_image_file($fileurl, $restricttocontext = null)
 {
     global $CFG;
     if (strpos($fileurl, $CFG->wwwroot.'/pluginfile.php') === false) {
