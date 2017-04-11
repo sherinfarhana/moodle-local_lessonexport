@@ -59,12 +59,12 @@ class local_lessonexportepub
         $context = context_module::instance($cm->id);
         $ret = array();
 
-        // $capability = 'local/lessonexportepub:export';
-        // if (has_capability($capability, $context)) {
+        $capability = 'local/lessonexportepub:export';
+        if (has_capability($capability, $context)) {
             $name = get_string('exportepub', 'local_lessonexportepub');
             $url = new moodle_url('/local/lessonexportepub/export.php', array('id' => $cm->id, 'type' => 'epub'));
             $ret[$name] = $url;
-        // }
+        }
 
         return $ret;
     }
