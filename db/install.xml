@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="local_lessonexport_order" COMMENT="Look after the ordering information used when exporting lesson pages">
+    <TABLE NAME="local_lessonexportepub_order" COMMENT="Look after the ordering information used when exporting lesson pages">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="cmid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Used when cleaning up data for deleted lessons"/>
@@ -19,7 +19,7 @@
         <KEY NAME="pageid" TYPE="foreign-unique" FIELDS="pageid" REFTABLE="lesson_pages" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <TABLE NAME="local_lessonexport_queue" COMMENT="Queue of lessons to export">
+    <TABLE NAME="local_lessonexportepub_queue" COMMENT="Queue of lessons to export">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="lessonid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The lesson to export"/>

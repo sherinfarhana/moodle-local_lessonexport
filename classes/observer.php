@@ -28,16 +28,16 @@ defined('MOODLE_INTERNAL') || die();
 
 class observer {
     /**
-     * Clean up any local_lessonexport_order records associated with the deleted course.
+     * Clean up any local_lessonexportepub_order records associated with the deleted course.
      * @param \core\event\course_deleted $event
      */
     public static function course_deleted(\core\event\course_deleted $event) {
         global $DB;
-        $DB->delete_records('local_lessonexport_order', ['courseid' => $event->courseid]);
+        $DB->delete_records('local_lessonexportepub_order', ['courseid' => $event->courseid]);
     }
 
     /**
-     * Clean up any local_lessonexport_order records associated with the deleted lesson.
+     * Clean up any local_lessolocal_lessonexportepub_ordernexport_order records associated with the deleted lesson.
      * @param \core\event\course_module_deleted $event
      */
     public static function course_module_deleted(\core\event\course_module_deleted $event) {
@@ -45,6 +45,6 @@ class observer {
         if ($event->other['modulename'] != 'lesson') {
             return; // Nothing to do if it is not a lesson which was deleted.
         }
-        $DB->delete_records('local_lessonexport_order', ['cmid' => $event->contextinstanceid]);
+        $DB->delete_records('local_lessonexportepub_order', ['cmid' => $event->contextinstanceid]);
     }
 }
