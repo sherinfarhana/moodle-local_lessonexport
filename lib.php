@@ -125,20 +125,20 @@ class local_lessonexportepub
         $lessons = $DB->get_records_sql($sql, $params);
 
         // Save a list of all lessons to be exported.
-        $currentqueue = $DB->get_records('local_lessonexport_queue');
+        $currentqueue = $DB->get_records('local_lessonexportepub_queue');
         foreach ($lessons as $lesson) {
             if (isset($currentqueue[$lesson->id])) {
                 // A lesson already in the queue has been updated - reset the export attempts (if non-zero).
                 $queueitem = $currentqueue[$lesson->id];
                 if ($queueitem->exportattempts != 0) {
-                    $DB->set_field('local_lessonexport_queue', 'exportattempts', 0, array('id' => $queueitem->id));
+                    $DB->set_field('local_lessonexportepub_queue', 'exportattempts', 0, array('id' => $queueitem->id));
                 }
             } else {
                 $ins = (object)array(
                     'lessonid' => $lesson->id,
                     'exportattempts' => 0,
                 );
-                $DB->insert_record('local_lessonexport_queue', $ins, false);
+                $DB->insert_record('local_lessonexportepub_queue', $ins, false);
             }
         }
 
@@ -173,7 +173,7 @@ class local_lessonexportepub
         }
 
         // Update the 'export attempts' in the database.
-        $DB->set_field('local_lessonexport_queue', 'exportattempts', $nextitem->exportattempts + 1, ['id' => $nextitem->queueid]);
+        $DB->set_field('local_lessonexportepub_queue', 'exportattempts', $nextitem->exportattempts + 1, ['id' => $nextitem->queueid]);
 
         // Add the lesson + cm objects to the return object.
         if (!$lesson || $lesson->id != $nextitem->lessonid) {
@@ -200,7 +200,7 @@ class local_lessonexportepub
     protected static function remove_from_queue($lesson)
     {
         global $DB;
-        $DB->delete_records('local_lessonexport_queue', array('id' => $lesson->queueid));
+        $DB->delete_records('local_lessonexportepub_queue', array('id' => $lesson->queueid));
     }
 
     protected function load_pages()
