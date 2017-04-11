@@ -22,8 +22,6 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace local_lessonexportepub;
-
 defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->dirroot.'/local/lessonexportepub/lib/luciepub/LuciEPUB.php');
@@ -719,7 +717,7 @@ class lessonexport_epub extends LessonLuciEPUB
         // Handle <img> tags.
         if (preg_match_all('~(<img [^>]*?)src=([\'"])(.+?)[\'"]~', $html, $matches)) {
             foreach ($matches[3] as $imageurl) {
-                if ($file = local_lessonexport_get_image_file($imageurl)) {
+                if ($file = local_lessonexportepub_get_image_file($imageurl)) {
                     $newpath = implode('/', array('images', $file->get_contextid(), $file->get_component(), $file->get_filearea(),
                                                   $file->get_itemid(), $file->get_filepath(), $file->get_filename()));
                     $newpath = str_replace(array('///', '//'), '/', $newpath);
@@ -776,7 +774,7 @@ class lessonexport_epub extends LessonLuciEPUB
     }
 }
 
-class Util
+class EpubUtil
 {
     public static function hex_to_rgb($hex)
     {
