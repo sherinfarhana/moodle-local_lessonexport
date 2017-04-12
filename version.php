@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package   local_lessonexport
+ * @package   local_lessonexportepub
  * @author    Adam King
  * @author    Davo Smith
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,12 +25,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017041101;
+$plugin->version   = 2017041200;
 $plugin->requires  = 2014051200; // Moodle 2.7.
 $plugin->cron      = DAYSECS;
 $plugin->component = 'local_lessonexportepub';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "2.7+ (Build: 2017041101)";
+$plugin->release   = "2.7+ (Build: 2017041200)";
 
 $plugin->dependencies = array(
     'mod_lesson' => ANY_VERSION,

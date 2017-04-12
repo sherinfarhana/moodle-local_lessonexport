@@ -38,8 +38,7 @@ class local_lessonexportepub
 
     const MAX_EXPORT_ATTEMPTS = 2;
 
-    public function __construct($cm, $lesson)
-    {
+    public function __construct($cm, $lesson) {
         $this->cm = $cm;
         $this->lesson = $lesson;
         $this->lessoninfo = new local_lessonexportepub_info();
@@ -52,8 +51,7 @@ class local_lessonexportepub
      *
      * @param object The Course Module from the current context.
      */
-    public static function get_links($cm)
-    {
+    public static function get_links($cm) {
         $context = context_module::instance($cm->id);
         $ret = array();
 
@@ -72,8 +70,7 @@ class local_lessonexportepub
      *
      * @throws required_capability_exception if the user does not have the capability.
      */
-    public function check_access()
-    {
+    public function check_access() {
         global $USER;
         $context = context_module::instance($this->cm->id);
         $capability = 'local/lessonexportepub:export';
@@ -86,8 +83,7 @@ class local_lessonexportepub
      * @param bool $download (optional) true to send the file directly to the user's browser
      * @return string the path to the generated file, if not downloading directly
      */
-    public function export($download = true)
-    {
+    public function export($download = true) {
         // Raise the max execution time to 5 min, not 30 seconds.
         @set_time_limit(300);
 
@@ -108,8 +104,7 @@ class local_lessonexportepub
      *
      * @param $config
      */
-    protected static function update_queue($config)
-    {
+    protected static function update_queue($config) {
         global $DB;
 
         if (empty($config->lastqueueupdate)) {
@@ -152,8 +147,7 @@ class local_lessonexportepub
      *
      * @return object|null null if none left to export
      */
-    protected static function get_next_from_queue()
-    {
+    protected static function get_next_from_queue() {
         global $DB;
 
         static $cm = null;
@@ -197,14 +191,12 @@ class local_lessonexportepub
      *
      * @param object $lesson
      */
-    protected static function remove_from_queue($lesson)
-    {
+    protected static function remove_from_queue($lesson) {
         global $DB;
         $DB->delete_records('local_lessonexportepub_queue', array('id' => $lesson->queueid));
     }
 
-    protected function load_pages()
-    {
+    protected function load_pages() {
         global $DB, $USER;
 
         $lesson = new Lesson($this->lesson);
@@ -245,8 +237,7 @@ class local_lessonexportepub
      * @param A Lesson page.
      * @return Formatted page contents.
      */
-    protected function format_answers($page)
-    {
+    protected function format_answers($page) {
         $pagetype = $page->get_typeid();
         $contents = $page->contents;
         $answers = $page->answers;
@@ -295,8 +286,7 @@ class local_lessonexportepub
      * @param padeids An array of page identifiers, from the loaded pages.
      * @see local_lessonexportepub::load_pages() for the array of pageids.
      */
-    protected function fix_internal_links($page, $pageids)
-    {
+    protected function fix_internal_links($page, $pageids) {
         // Replace links to other pages with links to page 'pageid-[page id].html'.
         $baseurl = new moodle_url('/mod/lesson/view.php', array('pageid' => 'PAGEID'));
         $baseurl = $baseurl->out(false);
@@ -335,8 +325,7 @@ class local_lessonexportepub
      *
      * @return object An instance of lessonexport_epub.
      */
-    protected function start_export($download)
-    {
+    protected function start_export($download) {
         global $CFG;
         $exp = null;
         $exp = new lessonexport_epub();
@@ -357,8 +346,7 @@ class local_lessonexportepub
      * @param exp The export object of type lessonexport_epub.
      * @param page The page to add to the export object.
      */
-    protected function export_page($exp, $page)
-    {
+    protected function export_page($exp, $page) {
         $content = '<h1>'.$page->title.'</h1>'.$page->contents;
         $href = 'pageid-'.$page->id.'.html';
         $exp->add_html($content, $page->title, array('tidy' => false, 'href' => $href, 'toc' => true));
@@ -370,8 +358,7 @@ class local_lessonexportepub
      *
      * @return string The file name or path to the document.
      */
-    protected function end_export($exp, $download)
-    {
+    protected function end_export($exp, $download) {
         global $CFG;
 
         $filename = $this->get_filename($download);
@@ -397,8 +384,7 @@ class local_lessonexportepub
      *
      * @param download A boolean of whether the file will be immediately downloaded.
      */
-    protected function get_filename($download)
-    {
+    protected function get_filename($download) {
         $info = (object)array(
             'timestamp' => userdate(time(), '%Y-%m-%d %H:%M'),
             'lessonname' => format_string($this->lesson->name),
@@ -423,8 +409,7 @@ class local_lessonexportepub
      *
      * @param exp The export object to add the cover-sheet to.
      */
-    protected function add_coversheet($exp)
-    {
+    protected function add_coversheet($exp) {
         $this->add_coversheet_epub($exp);
     }
 
@@ -434,8 +419,7 @@ class local_lessonexportepub
      *
      * @param exp The lessonexport_epub object to add the cover-sheet to.
      */
-    protected function add_coversheet_epub(LessonLuciEPUB $exp)
-    {
+    protected function add_coversheet_epub(LessonLuciEPUB $exp) {
         global $CFG;
 
         $title = $this->lesson->name;
@@ -449,20 +433,32 @@ class local_lessonexportepub
 
         $html = '';
 
-        $imgel = html_writer::empty_tag('img', array('src' => $img, 'style' => 'max-width: 90%;'));
-        $html .= html_writer::div($imgel, 'fronttitle', array('style' => 'text-align: center; padding: 1em 0;'));
-        $html .= html_writer::div(' ', 'fronttitletop', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: rgb(18, 160, 83); margin-top: 1em;'));
-        $html .= html_writer::tag('h1', $title, array('style' => 'display: block; width: 100%; background-color: rgb(18, 160, 83);
-                                                                  min-height: 2em; text-align: center; padding-top: 0.8em;
-                                                                  size: 1em; margin: 0; color: #fff;' ));
-        $html .= html_writer::div(' ', 'fronttitlebottom', array('style' => 'display: block; width: 100%; height: 0.4em;
-                                                                               background-color: rgb(18, 160, 83); margin-bottom: 1em;'));
-        $html .= html_writer::div($description, 'frontdescription', array('style' => 'margin: 0.5em 1em;'));
-        $html .= html_writer::div($info, 'frontinfo', array('style' => 'margin: 2em 1em'));
-
-        // $html = html_writer::div($html, 'frontpage', array('style' => 'margin: 0.5em; border: solid black 1px; border-radius: 0.8em;
-        //                                                                width: 90%;'));
+        $imgel = html_writer::empty_tag('img', array(
+            'src' => $img,
+            'style' => 'max-width: 90%;'
+        ));
+        $html .= html_writer::div($imgel, 'fronttitle', array(
+            'style' => 'text-align: center; padding: 1em 0;'
+        ));
+        $html .= html_writer::div(' ', 'fronttitletop', array(
+            'style' => 'display: block; width: 100%; height: 0.4em;
+                        background-color: rgb(18, 160, 83); margin-top: 1em;'
+        ));
+        $html .= html_writer::tag('h1', $title, array(
+            'style' => 'display: block; width: 100%; background-color: rgb(18, 160, 83);
+                        min-height: 2em; text-align: center; padding-top: 0.8em;
+                        size: 1em; margin: 0; color: #fff;'
+        ));
+        $html .= html_writer::div(' ', 'fronttitlebottom', array(
+            'style' => 'display: block; width: 100%; height: 0.4em;
+                        background-color: rgb(18, 160, 83); margin-bottom: 1em;'
+        ));
+        $html .= html_writer::div($description, 'frontdescription', array(
+            'style' => 'margin: 0.5em 1em;'
+        ));
+        $html .= html_writer::div($info, 'frontinfo', array(
+            'style' => 'margin: 2em 1em'
+        ));
 
         $exp->add_spine_item($html, 'cover.html');
     }
@@ -473,8 +469,7 @@ class local_lessonexportepub
      *
      * @return string A HTML string of the imploded export data.
      */
-    protected function get_coversheet_info()
-    {
+    protected function get_coversheet_info() {
         $info = array();
         if ($this->lessoninfo->has_timemodified()) {
             $strinfo = (object)array(
@@ -502,13 +497,11 @@ class local_lessonexportepub
  *
  * @param $unused
  */
-function local_lessonexportepub_extends_navigation($unused)
-{
+function local_lessonexportepub_extends_navigation($unused) {
     local_lessonexport_extend_navigation($unused);
 }
 
-function local_lessonexportepub_extend_navigation($unused)
-{
+function local_lessonexportepub_extend_navigation($unused) {
     global $PAGE, $DB, $USER;
 
     $settingsnav = null;
@@ -543,11 +536,14 @@ function local_lessonexportepub_extend_navigation($unused)
         $jslinks[] = $link;
     }
 
-    $PAGE->requires->yui_module('moodle-local_lessonexportepub-printlinks', 'M.local_lessonexportepub.printlinks.init', array($jslinks));
+    $PAGE->requires->yui_module(
+        'moodle-local_lessonexportepub-printlinks',
+        'M.local_lessonexportepub.printlinks.init',
+        array($jslinks)
+    );
 }
 
-function local_lessonexportepub_cron()
-{
+function local_lessonexportepub_cron() {
     local_lessonexportepub::cron();
 }
 
@@ -562,13 +558,11 @@ class local_lessonexportepub_info
     protected $modifiedby = null;
     protected $timeprinted = 0;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->timeprinted = time();
     }
 
-    public function update_times($timecreated, $timemodified, $modifiedbyid)
-    {
+    public function update_times($timecreated, $timemodified, $modifiedbyid) {
         if (!$this->timecreated || $this->timecreated > $timecreated) {
             $this->timecreated = $timecreated;
         }
@@ -581,38 +575,31 @@ class local_lessonexportepub_info
         }
     }
 
-    public function has_timecreated()
-    {
+    public function has_timecreated() {
         return (bool)$this->timecreated;
     }
 
-    public function has_timemodified()
-    {
+    public function has_timemodified() {
         return (bool)$this->timemodified;
     }
 
-    public function has_timeprinted()
-    {
+    public function has_timeprinted() {
         return (bool)$this->timeprinted;
     }
 
-    public function format_timecreated()
-    {
+    public function format_timecreated() {
         return userdate($this->timecreated);
     }
 
-    public function format_timemodified()
-    {
+    public function format_timemodified() {
         return userdate($this->timemodified);
     }
 
-    public function format_timeprinted()
-    {
+    public function format_timeprinted() {
         return userdate($this->timeprinted);
     }
 
-    public function get_modifiedby()
-    {
+    public function get_modifiedby() {
         global $USER, $DB;
 
         if ($this->modifiedby === null) {
@@ -635,8 +622,7 @@ class local_lessonexportepub_info
  * @param context $restricttocontext (optional) if set, only files from this lesson will be included
  * @return null|stored_file
  */
-function local_lessonexportepub_get_image_file($fileurl, $restricttocontext = null)
-{
+function local_lessonexportepub_get_image_file($fileurl, $restricttocontext = null) {
     global $CFG;
     if (strpos($fileurl, $CFG->wwwroot.'/pluginfile.php') === false) {
         return null;
@@ -701,12 +687,11 @@ class lessonexport_epub extends LessonLuciEPUB
     /**
      * Add HTML to the epub document, ensuring <img> tags are handled correctly.
      *
-     * @param html The HTML string to apply to the document.
-     * @param title The title of the page the HTML is for.
+     * @param html The HTML string to apply to the document
+     * @param title The title of the page the HTML is for
      * @param config An array of additional settings to use in the method: toc, href, tidy
      */
-    public function add_html($html, $title, $config)
-    {
+    public function add_html($html, $title, $config) {
         if ($config['tidy'] && class_exists('tidy')) {
             $tidy = new tidy();
             $tidy->parseString($html, array(), 'utf8');
@@ -746,8 +731,7 @@ class lessonexport_epub extends LessonLuciEPUB
      *
      * @see LessonLuciEPUB::addadd_spine_item()
      */
-    public function add_spine_item($data, $href = null, $fallback = null, $properties = null)
-    {
+    public function add_spine_item($data, $href = null, $fallback = null, $properties = null) {
         $globalconf = get_config('local_lessonexportepub');
         $style = '';
 
@@ -774,21 +758,29 @@ class lessonexport_epub extends LessonLuciEPUB
     }
 }
 
+/**
+ * Class Epubutil
+ */
 class EpubUtil
 {
-    public static function hex_to_rgb($hex)
-    {
+    /**
+     * Method for turning hexadecimal values into RGB integers.
+     *
+     * @param A hexadecimal string, with or without hash symbol
+     * @return An RGB array with a length of 3
+     */
+    public static function hex_to_rgb($hex) {
         global $CFG;
 
-        // If there is a hash symbol with the hex, remove it
+        // If there is a hash symbol with the hex, remove it.
         if (strpos($hex, '#') !== false) {
             $hex = substr($hex, 1);
         }
 
-        // Split the hexadecimal into RGB chunks
+        // Split the hexadecimal into RGB chunks.
         $hexColour = str_split($hex, 2);
 
-        // Convert the base16 hex values into base10 decimals
+        // Convert the base16 hex values into base10 decimals.
         $rgbColour = array(
             hexdec($hexColour[0]),
             hexdec($hexColour[1]),
