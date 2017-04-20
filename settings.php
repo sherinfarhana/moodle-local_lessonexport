@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
-    $ADMIN->add('modules', new admin_category('lessonexport', get_string('pluginname', 'local_lessonexport')));
+    $ADMIN->add('modules', new admin_category('lessonexport', get_string('plugingroup', 'local_lessonexport')));
     $page = new admin_settingpage('lessonexportpage', get_string('pluginname', 'local_lessonexport'));
 
     $page->add(new admin_setting_configtext('local_lessonexport/customfont',
@@ -94,10 +94,20 @@ if ($hassiteconfig) {
                                             get_string('pdfprotection_desc', 'local_lessonexport'), $defaults, $choices));
 
     $page->add(new admin_setting_configcheckbox('local_lessonexport/exportstrict', get_string('exportstrict', 'local_lessonexport'),
-    get_string('exportstrict_desc', 'local_lessonexport'), 0));
+                                            get_string('exportstrict_desc', 'local_lessonexport'), 0));
 
     $page->add(new admin_setting_configcolourpicker('local_lessonexport/coverColour', get_string('covercolour', 'local_lessonexport'),
                                             get_string('covercolour_desc', 'local_lessonexport'), '#12A053'));
+
+    // $supportedLanguages = array(
+    //     'english' => 'English',
+    //     'arabic' => 'Arabic'
+    // );
+    // $page->add(new admin_Setting_configselect('local_lessonexport/language', get_string('language', 'local_lessonexport'),
+    //                                         get_string('language_desc', 'local_lessonexport'), 'english', $supportedLanguages));
+
+    $page->add(new admin_setting_configcheckbox('local_lessonexport/rightToLeft', get_string('righttoleft', 'local_lessonexport'),
+                                            get_string('righttoleft_desc', 'local_lessonexport'), 0));
 
     $ADMIN->add('lessonexport', $page);
 }

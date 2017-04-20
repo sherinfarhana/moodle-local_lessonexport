@@ -26,6 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once($CFG->libdir.'/pdflib.php');
 require_once($CFG->dirroot.'/mod/lesson/locallib.php');
+require_once($CFG->dirroot.'/local/lessonexport/lang/LanguageFactory.php');
 
 class local_lessonexport
 {
@@ -426,6 +427,12 @@ class local_lessonexport
         $exp = new lessonexport_pdf();
         $exp->setCourseModule($this->cm);
         $exp->setLesson($this->lesson);
+
+        if (!empty($CFG->rightToLeft)) {
+            $exp->setRTL($CFG->rightToLeft);
+        }
+
+        $exp->setRTL(true);
         $restricttocontext = false;
         if ($download) {
             $restricttocontext = context_module::instance($this->cm->id);
@@ -624,15 +631,32 @@ function local_lessonexport_extends_navigation($unused)
     local_lessonexport_extend_navigation($unused);
 }
 
+// TODO:- Find a means to add buttons to the page even if the settingsnav
+//        does not exist in this context.
 function local_lessonexport_extend_navigation($unused)
 {
     global $PAGE, $DB, $USER;
 
+    // If there is a course module in this context and it's type is a lesson,
+    // display the modifications to the navigation block. If there is no settingsnav
+    // available, return (Button links will still have been added).
     $settingsnav = null;
     if (!$PAGE->cm || $PAGE->cm->modname != 'lesson') {
         return;
-    } else {
+    } elseif (!empty($PAGE->settingsnav)) {
         $settingsnav = $PAGE->settingsnav;
+    }
+
+    if ($settingsnav != null) {
+        $modulesettings = $settingsnav->get('modulesettings');
+        if (!$modulesettings) {
+            $modulesettings = $settingsnav->prepend(get_string('pluginadministration', 'mod_lesson'), null,
+                                                    navigation_node::TYPE_SETTING, null, 'modulesettings');
+        }
+
+        foreach ($links as $name => $url) {
+            $modulesettings->add($name, $url, navigation_node::TYPE_SETTING);
+        }
     }
 
     $groupid = groups_get_activity_group($PAGE->cm);
@@ -642,16 +666,6 @@ function local_lessonexport_extend_navigation($unused)
         return;
     }
 
-    $modulesettings = $settingsnav->get('modulesettings');
-    if (!$modulesettings) {
-        $modulesettings = $settingsnav->prepend(get_string('pluginadministration', 'mod_lesson'), null,
-                                                navigation_node::TYPE_SETTING, null, 'modulesettings');
-    }
-
-    foreach ($links as $name => $url) {
-        $modulesettings->add($name, $url, navigation_node::TYPE_SETTING);
-    }
-
     // Use javascript to insert the pdf link.
     $jslinks = array();
     foreach ($links as $name => $url) {
@@ -659,6 +673,7 @@ function local_lessonexport_extend_navigation($unused)
         $link = html_writer::div($link, 'exportpdf');
         $jslinks[] = $link;
     }
+
     $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));
 }
 
@@ -819,6 +834,7 @@ class lessonexport_pdf extends pdf
 
     private $cm;
     private $lesson;
+    private $language;
 
     public function setCourseModule($cm)
     {
@@ -828,6 +844,10 @@ class lessonexport_pdf extends pdf
     public function setLesson($lesson)
     {
         $this->lesson = $lesson;
+    }
+
+    public function setLanguage($lang) {
+        $this->language = $lang;
     }
 
     public function use_direct_image_load($restricttocontext = false)
@@ -891,7 +911,6 @@ class lessonexport_pdf extends pdf
         $alt = false,
         $altimgs = array()
     ) {
-
         $config = get_config('local_lessonexport');
         $exportstrict = $config->exportstrict;
 
@@ -1125,6 +1144,10 @@ class lessonexport_pdf extends pdf
         $this->Output($file, 'D');
 
         return $file;
+    }
+
+    public function getLanguage() {
+        return $this->language;
     }
 }
 

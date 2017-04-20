@@ -30,6 +30,7 @@ $string['failedinsertimage'] = 'Failed to insert image: {$a}';
 $string['filename'] = 'Export {$a->lessonname} {$a->timestamp}';
 $string['modified'] = 'Last modified by {$a->modifiedby} on {$a->timemodified}';
 $string['pluginname'] = 'Lesson Export PDF';
+$string['plugingroup'] = 'Lesson Export';
 $string['printed'] = 'This document was downloaded on {$a}';
 $string['publishemail'] = 'Auto-publish email';
 $string['publishemail_desc'] = 'The email address that PDFs will be sent to automatically whenever a lesson changes';
@@ -85,3 +86,8 @@ $string['assemblepermission'] = 'assemble';
 $string['assemblepermission_desc'] = 'Assemble the document';
 $string['highdefpermission'] = 'print-high';
 $string['highdefpermission_desc'] = 'Print the document in high definition';
+
+$string['language'] = 'Language';
+$string['language_desc'] = 'If your language follows a set of rules (RTL text, special characters), please select your language here.';
+$string['righttoleft'] = 'Right To Left';
+$string['righttoleft_desc'] = 'Whether or not to print text from right to left.';
