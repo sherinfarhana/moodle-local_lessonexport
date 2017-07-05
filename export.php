@@ -37,5 +37,4 @@ require_login($course, false, $cm);
 
 $export = new local_lessonexport($cm, $lesson);
 $export->check_access();
-
 $export->export();

@@ -647,7 +647,13 @@ function local_lessonexport_extend_navigation($unused)
         $settingsnav = $PAGE->settingsnav;
     }
 
-    if ($settingsnav != null) {
+    // If the settingsnav was never set by this point, we don't need to do anything,
+    // it's not a lesson coursemodule.
+    if (empty($settingsnav)) {
+        return;
+    }
+
+    if ($settingsnav != null && !empty($settingsnav)) {
         $modulesettings = $settingsnav->get('modulesettings');
         if (!$modulesettings) {
             $modulesettings = $settingsnav->prepend(get_string('pluginadministration', 'mod_lesson'), null,
