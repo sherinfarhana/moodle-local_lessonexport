@@ -8,7 +8,7 @@
         <licenseversion>3.0</licenseversion>
     </library>
     <library>
-        <location>lib/liciepub/LuciZip.php</location>
+        <location>lib/luciepub/LuciZip.php</location>
         <name>LuciZip</name>
         <version>1.50</version>
         <license>GNU Lesser General Public License</license>
