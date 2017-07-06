@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017041101;
-$plugin->requires  = 2014051200; // Moodle 2.7.
+$plugin->version   = 2017041102;
+$plugin->requires  = 2014051200;
 $plugin->cron      = DAYSECS;
 $plugin->component = 'local_lessonexport';
 $plugin->maturity  = MATURITY_STABLE;
