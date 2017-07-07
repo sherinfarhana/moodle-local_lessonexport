@@ -8,9 +8,6 @@ M.local_lessonexport.printlinks = {
         try {
             el = Y.one('#region-main>[role="main"]')
             el = el.one('#maincontent');
-            // if (el.next('#maincontent')) {
-            //     el = el.next('#maincontent');
-            // }
             el = el.next();
             parent = el.ancestor();
         } catch (e) {
@@ -22,6 +19,7 @@ M.local_lessonexport.printlinks = {
             if (!links.hasOwnProperty(i)) {
                 continue;
             }
+
             parent.insert(links[i], el);
         }
     }

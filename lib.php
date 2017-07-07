@@ -647,6 +647,23 @@ function local_lessonexport_extend_navigation($unused)
         $settingsnav = $PAGE->settingsnav;
     }
 
+    $groupid = groups_get_activity_group($PAGE->cm);
+    $lesson = $DB->get_record('lesson', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
+
+    if (!$links = local_lessonexport::get_links($PAGE->cm, $USER->id, $groupid)) {
+        return;
+    }
+
+    // Use javascript to insert the pdf link.
+    $jslinks = array();
+    foreach ($links as $name => $url) {
+        $link = html_writer::link($url, $name);
+        $link = html_writer::div($link, 'exportpdf');
+        $jslinks[] = $link;
+    }
+
+    $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));
+
     // If the settingsnav was never set by this point, we don't need to do anything,
     // it's not a lesson coursemodule.
     if (empty($settingsnav)) {
@@ -664,23 +681,6 @@ function local_lessonexport_extend_navigation($unused)
             $modulesettings->add($name, $url, navigation_node::TYPE_SETTING);
         }
     }
-
-    $groupid = groups_get_activity_group($PAGE->cm);
-    $lesson = $DB->get_record('lesson', array('id' => $PAGE->cm->instance), '*', MUST_EXIST);
-
-    if (!$links = local_lessonexport::get_links($PAGE->cm, $USER->id, $groupid)) {
-        return;
-    }
-
-    // Use javascript to insert the pdf link.
-    $jslinks = array();
-    foreach ($links as $name => $url) {
-        $link = html_writer::link($url, $name);
-        $link = html_writer::div($link, 'exportpdf');
-        $jslinks[] = $link;
-    }
-
-    $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));
 }
 
 function local_lessonexport_cron()
@@ -972,8 +972,7 @@ class lessonexport_pdf extends pdf
 
     public function Footer()
     {
-        global $CFG;
-        global $DB;
+        global $CFG, $DB;
 
         $config = get_config('local_lessonexport');
 
