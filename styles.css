@@ -1,0 +1,13 @@
+.fontUploaded {
+    background-color: #C2FF9E;
+    border: 1px solid #86E885;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+
+.fontUploaded p {
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}

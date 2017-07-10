@@ -91,3 +91,6 @@ $string['language'] = 'Language';
 $string['language_desc'] = 'If your language follows a set of rules (RTL text, special characters), please select your language here.';
 $string['righttoleft'] = 'Right To Left';
 $string['righttoleft_desc'] = 'Whether or not to print text from right to left.';
+
+$string['fontspage'] = "PDF Fonts";
+$string['fonts'] = "fonts";

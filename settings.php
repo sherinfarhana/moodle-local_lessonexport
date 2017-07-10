@@ -26,6 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 if ($hassiteconfig) {
     $ADMIN->add('modules', new admin_category('lessonexport', get_string('plugingroup', 'local_lessonexport')));
+
+    $ADMIN->add('lessonexport', new admin_externalpage(
+        'pdffonts',
+        get_string('fontspage', 'local_lessonexport'),
+        new moodle_url('/local/lessonexport/pdffonts.php'),
+        array('moodle/site:config')
+    ));
+
     $page = new admin_settingpage('lessonexportpage', get_string('pluginname', 'local_lessonexport'));
 
     $page->add(new admin_setting_configtext('local_lessonexport/customfont',
