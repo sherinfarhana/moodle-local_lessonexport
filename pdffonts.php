@@ -42,6 +42,9 @@ $PAGE->set_url($CFG->wwwroot.'/local/lessonexport/pdffonts.php');
 
 echo $OUTPUT->header();
 
+// echo "<div class='fontLocation'><p>Your fonts directory can be located at $fontsdir</p></div>";
+echo "<div class='alert alert-block alert-info'><p>Your fonts directory can be located at $fontsdir</p></div>";
+
 $uploadForm = new fontupload_form();
 //Form processing and displaying is done here
 if ($uploadForm->is_cancelled()) {
@@ -62,6 +65,9 @@ if ($uploadForm->is_cancelled()) {
 
 		echo "<div class='fontUploaded'><p>Added ".$file->get_filename()." to the available TCPDF fonts as $newfont</p></div>";
 	}
+
+	$continue = new moodle_url('/local/lessonexport/pdffonts.php');
+	echo "<div class='continuebutton'>(<a href='$continue'>Continue</a>)</div>";
 } else {
 	//displays the form
     $uploadForm->display();

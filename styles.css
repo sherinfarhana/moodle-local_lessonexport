@@ -5,8 +5,22 @@
     margin-bottom: 10px;
     padding: 10px;
 }
-
 .fontUploaded p {
+    color: #099c0a;
+    text-align: left;
+    margin: 0;
+    padding: 0;
+}
+
+.fontLocation {
+    background-color: #D9EDF7;
+    border: 1px solid #BCE8F1;
+    border-radius: 3px;
+    margin-bottom: 10px;
+    padding: 10px;
+}
+.fontLocation p {
+    color: #3A87AD;
     text-align: left;
     margin: 0;
     padding: 0;
