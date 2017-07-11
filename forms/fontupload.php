@@ -31,7 +31,7 @@ class fontupload_form extends moodleform {
         $maxbytes = 1024000 * 512; // ~512MB
         $mform->addElement('filemanager', 'fonts', "Upload Fonts", null,
                     array('subdirs' => 0, 'maxbytes' => $maxbytes, 'areamaxbytes' => $maxbytes, 'maxfiles' => 50,
-                          'accepted_types' => array('.ttf', '.otf'), 'return_types'=> FILE_INTERNAL | FILE_EXTERNAL));
+                          'accepted_types' => array('.ttf', '.otf')));
 
         $this->add_action_buttons(true, "Upload");
     }

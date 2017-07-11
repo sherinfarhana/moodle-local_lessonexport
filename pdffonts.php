@@ -32,30 +32,34 @@ require_once(__DIR__ . "/forms/fontupload.php");
 require_login();
 
 $fontsdir = TCPDF_FONTS::_getfontpath();
-
 $context = context_user::instance($USER->id);
+$continue = new moodle_url('/local/lessonexport/pdffonts.php');
+
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title("PDF Font Settings");
 $PAGE->set_heading("PDF Fonts");
 $PAGE->set_url($CFG->wwwroot.'/local/lessonexport/pdffonts.php');
 
-echo $OUTPUT->header();
-
-// echo "<div class='fontLocation'><p>Your fonts directory can be located at $fontsdir</p></div>";
-echo "<div class='alert alert-block alert-info'><p>Your fonts directory can be located at $fontsdir</p></div>";
+// Note: Print the header and alert-info conditionally to prevent moodle complaining about
+// redirects after printing content.
 
 $uploadForm = new fontupload_form();
 //Form processing and displaying is done here
 if ($uploadForm->is_cancelled()) {
 	//Handle form cancel operation, if cancel button is present on form
+	redirect($continue);
 } elseif ($fromform = $uploadForm->get_data()) {
+	echo $OUTPUT->header();
+	echo "<div class='alert alert-block alert-info'><p>Your fonts directory can be located at $fontsdir</p></div>";
+
 	// Process the data from the form.
 	$formdata = $uploadForm->get_data();
 	$itemid = $formdata->fonts;
 
 	$fs = get_file_storage();
 	$files = $fs->get_area_files($context->id, "user", "draft", $itemid, 'filename', false);
+
 	foreach ($files as $file) {
 		$filename = $fontsdir.$file->get_filename();
 		$file->copy_content_to($filename);
@@ -66,10 +70,10 @@ if ($uploadForm->is_cancelled()) {
 		echo "<div class='fontUploaded'><p>Added ".$file->get_filename()." to the available TCPDF fonts as $newfont</p></div>";
 	}
 
-	$continue = new moodle_url('/local/lessonexport/pdffonts.php');
 	echo "<div class='continuebutton'>(<a href='$continue'>Continue</a>)</div>";
 } else {
-	//displays the form
+	echo $OUTPUT->header();
+	echo "<div class='alert alert-block alert-info'><p>Your fonts directory can be located at $fontsdir</p></div>";
     $uploadForm->display();
 }
 
