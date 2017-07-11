@@ -31,14 +31,14 @@ require_once(__DIR__ . "/forms/fontupload.php");
 
 require_login();
 
-$fontsdir = "$CFG->libdir/tcpdf/fonts";
+$fontsdir = TCPDF_FONTS::_getfontpath();
 
 $context = context_user::instance($USER->id);
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title("PDF Font Settings");
 $PAGE->set_heading("PDF Fonts");
-$PAGE->set_url($CFG->wwwroot.'/pdffonts.php');
+$PAGE->set_url($CFG->wwwroot.'/local/lessonexport/pdffonts.php');
 
 echo $OUTPUT->header();
 
@@ -52,20 +52,12 @@ if ($uploadForm->is_cancelled()) {
 	$itemid = $formdata->fonts;
 
 	$fs = get_file_storage();
-	// Context is wrong, need to correct it somehow
 	$files = $fs->get_area_files($context->id, "user", "draft", $itemid, 'filename', false);
 	foreach ($files as $file) {
-		$filename = "$CFG->libdir/tcpdf/fonts/".$file->get_filename();
+		$filename = "$fontsdir".$file->get_filename();
 		$file->copy_content_to($filename);
-		$ext = explode('.', $file->get_filename())[1];
-
-        if ($ext == 'ttf') {
-			$newfont = TCPDF_FONTS::addTTFfont("$fontsdir/".$file->get_filename(), "TrueTypeUnicode", "", 32);
-		} else {
-			$newfont = TCPDF_FONTS::addTTFfont("$fontsdir/".$file->get_filename(), "OpenTypeUnicode", "", 32);
-		}
-
-		unlink($filename);
+		$newfont = TCPDF_FONTS::addTTFfont($filename);
+		// unlink($filename);
 		$file->delete();
 
 		echo "<div class='fontUploaded'><p>Added ".$file->get_filename()." to the available TCPDF fonts as $newfont</p></div>";
