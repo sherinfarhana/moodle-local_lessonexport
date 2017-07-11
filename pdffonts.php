@@ -54,10 +54,10 @@ if ($uploadForm->is_cancelled()) {
 	$fs = get_file_storage();
 	$files = $fs->get_area_files($context->id, "user", "draft", $itemid, 'filename', false);
 	foreach ($files as $file) {
-		$filename = "$fontsdir".$file->get_filename();
+		$filename = $fontsdir.$file->get_filename();
 		$file->copy_content_to($filename);
 		$newfont = TCPDF_FONTS::addTTFfont($filename);
-		// unlink($filename);
+		unlink($filename);
 		$file->delete();
 
 		echo "<div class='fontUploaded'><p>Added ".$file->get_filename()." to the available TCPDF fonts as $newfont</p></div>";
