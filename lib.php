@@ -432,7 +432,6 @@ class local_lessonexport
             $exp->setRTL($CFG->rightToLeft);
         }
 
-        $exp->setRTL(true);
         $restricttocontext = false;
         if ($download) {
             $restricttocontext = context_module::instance($this->cm->id);
