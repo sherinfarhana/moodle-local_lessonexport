@@ -661,7 +661,7 @@ function local_lessonexport_extend_navigation($unused)
         $jslinks[] = $link;
     }
 
-    $PAGE->requires->yui_module('moodle-local_lessonexport-printlinks', 'M.local_lessonexport.printlinks.init', array($jslinks));
+    $PAGE->requires->js_call_amd('local_lessonexport/printlinks', 'init', array($jslinks));
 
     // If the settingsnav was never set by this point, we don't need to do anything,
     // it's not a lesson coursemodule.

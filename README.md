@@ -38,6 +38,8 @@ There are many globally configurable options for exporting PDF documents from a 
 Customising
 ===========
 
+There is a page in the plugin settings (Site Administration->Plugins->Lesson Export) with a filemanager instance for uploading custom font files in the format of TrueTypeFont(TTF) or OpenTypeFont(OTF), which will be converted automatically into a usable TCPDF font, that you may use in the native plugin settings. The name of the font is given to you when the font is uploaded as it will often differ from the filename you uploaded it as.
+
 If you want to customise the button that exports documents, please use the class `exportpdf` for custom css. The outer `div` element with
 the class `exportpdf` is the container for an `a` element, which is the export link.
 

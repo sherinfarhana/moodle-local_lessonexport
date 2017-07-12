@@ -25,7 +25,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017041103;
+$plugin->version   = 2017071200;
 $plugin->requires  = 2014051200;
 $plugin->cron      = DAYSECS;
 $plugin->component = 'local_lessonexport';
