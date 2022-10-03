@@ -1,6 +1,6 @@
 .fontUploaded {
-    background-color: #C2FF9E;
-    border: 1px solid #86E885;
+    background-color: #c2ff9e;
+    border: 1px solid #86e885;
     border-radius: 3px;
     margin-bottom: 10px;
     padding: 10px;
@@ -13,14 +13,14 @@
 }
 
 .fontLocation {
-    background-color: #D9EDF7;
-    border: 1px solid #BCE8F1;
+    background-color: #d9edf7;
+    border: 1px solid #bce8f1;
     border-radius: 3px;
     margin-bottom: 10px;
     padding: 10px;
 }
 .fontLocation p {
-    color: #3A87AD;
+    color: #3a87ad;
     text-align: left;
     margin: 0;
     padding: 0;
